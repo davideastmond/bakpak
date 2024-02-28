@@ -6,6 +6,7 @@ import { CommonButton } from '@/components/common-button/Common-Button';
 
 import { UserClient } from '@/app/clients/user/user-client';
 import { ConfirmationDialog } from '@/components/confirmation-dialog/ConfirmationDialog';
+import { EventEditor } from '@/components/event-editor/EventEditor';
 import { Spinner } from '@/components/spinner/Spinner';
 import UserListContainer from '@/components/user-list-container/UserListContainer';
 import { useAuthContext } from '@/lib/auth-context';
@@ -14,7 +15,7 @@ import { UserEvent } from '@/models/user-event';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
-import { Alert, Box, Typography, styled } from '@mui/material';
+import { Alert, Box, Chip, Snackbar, Typography, styled } from '@mui/material';
 import dayjs from 'dayjs';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
@@ -47,6 +48,8 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
     { _id: string; firstName: string; lastName: string }[]
   >([]);
 
+  const [eventEditorModalOpen, setEventEditModalOpen] = useState<boolean>(false);
+  const [eventUpdateSnackbarOpen, setEventUpdateSnackbarOpen] = useState<boolean>(false);
   useEffect(() => {
     fetchEvent();
   }, []);
@@ -126,6 +129,20 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
     return userEvent?.eventCreatorId === session?.user?._id;
   };
 
+  const handleEventUpdated = async () => {
+    // Refresh the event
+    await fetchEvent();
+    setEventEditModalOpen(false);
+    setEventUpdateSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (e: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setEventUpdateSnackbarOpen(false);
+  };
+
   return (
     <Box>
       <Suspense fallback={<Spinner />}>
@@ -150,7 +167,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
           </Box>
           <Box className='hostedBy' mt={2} mb={2}>
             <Typography
-              fontWeight={'medium'}
+              fontWeight={'bold'}
               fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
               color={theme.palette.primary.charcoal}
             >
@@ -163,6 +180,25 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
               {eventHostName || ''}
             </Typography>
           </Box>
+          {status === AuthStatus.Authenticated && isSessionUserEventHost() && (
+            <Box>
+              <Box>
+                <Chip color='success' label="I'm hosting this."></Chip>
+              </Box>
+              <Box className='editEventButton'>
+                <CommonButton
+                  onButtonClick={() => setEventEditModalOpen(true)}
+                  label='Edit event'
+                  variant='text'
+                  textColor={theme.palette.primary.lightIndigo}
+                  baseButtonStyles={{
+                    fontSize: ['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem'],
+                    textDecoration: 'underline',
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
           <Box
             className='dateTimeBlock'
             display={'flex'}
@@ -188,19 +224,33 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                 }}
                 fontSize={['0.8rem', '1rem', '1.2rem', '1.4rem', '1.6rem']}
               >
-                Date and Hour
+                Time & Location
               </Typography>
             </Box>
             <Box>
               {userEvent ? (
-                <Typography
-                  p={2}
-                  className='someClass'
-                  fontWeight={'semibold'}
-                  fontSize={['0.8rem', '1rem', '1.2rem', '1.4rem', '1.6rem']}
-                >
-                  {`${formatDate(userEvent.startDate)} to ${formatDate(userEvent.endDate)} - ${userEvent.location?.city}, ${userEvent.location?.state?.toUpperCase()} ${userEvent.location?.country}`}
-                </Typography>
+                <Box>
+                  <Box>
+                    <Typography
+                      p={'5px'}
+                      className='someClass'
+                      fontWeight={'semibold'}
+                      fontSize={['0.8rem', '1rem', '1.2rem', '1.4rem', '1.6rem']}
+                    >
+                      {formatDateRange(userEvent.startDate, userEvent.endDate)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography
+                      p={'5px'}
+                      className='someClass'
+                      fontWeight={'semibold'}
+                      fontSize={['0.8rem', '1rem', '1.2rem', '1.4rem', '1.6rem']}
+                    >
+                      {userEvent.location.formattedAddress}
+                    </Typography>
+                  </Box>
+                </Box>
               ) : (
                 <Spinner />
               )}
@@ -352,6 +402,20 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
           },
         ]}
       />
+      {userEvent && (
+        <EventEditor
+          open={eventEditorModalOpen}
+          eventContext={userEvent!}
+          onClose={() => setEventEditModalOpen(false)}
+          onUpdateActionTaken={handleEventUpdated}
+        />
+      )}
+      <Snackbar
+        open={eventUpdateSnackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message='Event was updated'
+      />
     </Box>
   );
 }
@@ -380,7 +444,15 @@ const getEventImage = (setHasImageError: Dispatch<SetStateAction<boolean>>, imag
 };
 const StyledContentContainer = styled(Box)(({ theme }) => ({}));
 
-function formatDate(date: Date): string {
-  if (!date) return '';
-  return dayjs(date).format('D MMM, YYYY HH:mm A');
+// This function will format dates to be more readable when they are on the same day so the end date just
+// shows the time. When the start and end days are different, it will show the full date and time for both.
+function formatDateRange(start: Date, end: Date): string {
+  if (!start || !end) return '';
+
+  const startDate = dayjs(start);
+  const endDate = dayjs(end);
+  if (startDate.isSame(endDate, 'day')) {
+    return `${startDate.format('D MMM, YYYY HH:mm A')} to ${endDate.format('HH:mm A')}`;
+  }
+  return `${startDate.format('D MMM, YYYY HH:mm A')} to ${endDate.format('D MMM, YYYY HH:mm A')}`;
 }

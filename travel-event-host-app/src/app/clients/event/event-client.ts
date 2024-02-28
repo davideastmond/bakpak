@@ -184,4 +184,18 @@ export const EventClient = {
     console.log('res', res);
     return res;
   },
+
+  patchEventById: async (eventId: string, data: Partial<UserEvent>): Promise<void> => {
+    const endPoint = `/api/events/${eventId}`;
+    const response = await fetch(endPoint, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error('Error: Cannot update event');
+    }
+  },
 };
