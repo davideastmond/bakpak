@@ -7,11 +7,7 @@ import {
   textInputPaddings,
 } from '@/app/common-styles/form-field-sizes';
 import { getLocationPostDataFromGeocoderResult } from '@/app/integration/google-maps-api/address-helper';
-import {
-  S3PutObjectCommandParams,
-  SpacesFileUploader,
-} from '@/app/integration/spaces-file-uploader';
-import { generateFilename } from '@/app/integration/utils/generate-filename';
+import { ImageType, SpacesImageInteractor } from '@/app/integration/utils/spaces-image-interactor';
 import theme from '@/app/theme';
 import { ErrorComponent } from '@/components/ErrorComponent/ErrorComponent';
 import { AddressAutocomplete } from '@/components/address-autocomplete/AddressAutocomplete';
@@ -99,8 +95,7 @@ export default function CreateEventPage() {
       geocoderResultValidationSchema.validateSync(formValues, { abortEarly: false });
     } catch (err: any) {
       const extractedErrors = extractValidationErrors(err);
-      console.error('extracted geocoder errors', extractedErrors);
-      setErrors(extractValidationErrors(err));
+      setErrors(extractedErrors);
       return;
     }
 
@@ -125,26 +120,18 @@ export default function CreateEventPage() {
     }
 
     if (formValues.imageFile) {
-      const randomFileName: string = generateFilename(session?.user?._id);
-
-      const fileParams: S3PutObjectCommandParams = {
-        Bucket: process.env.NEXT_PUBLIC_SPACES_AVATAR_BUCKET_PATH!,
-        Key: `event_images/${randomFileName}`,
-        Body: formValues.imageFile,
-        ACL: 'public-read',
-      };
-      const cdnResolvePath = `${process.env.NEXT_PUBLIC_SPACES_AVATAR_CDN_PATH}/event_images/${randomFileName}`;
       try {
-        console.info('Attempting to load image to s3');
-        const upLoader: SpacesFileUploader = new SpacesFileUploader();
-        await upLoader.uploadObject(fileParams);
+        const cdnResolvePath: string = await SpacesImageInteractor.upload({
+          file: formValues.imageFile,
+          imageType: ImageType.EVENT,
+          objectNameSeed: session?.user?._id,
+        });
         data = {
           ...data,
           imageUrl: cdnResolvePath,
         };
-        console.log('image uploaded', cdnResolvePath);
       } catch (e: any) {
-        console.error('S3 upload error', e.message);
+        console.error('Error uploading image', e.message);
       }
     }
 
