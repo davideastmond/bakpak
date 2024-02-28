@@ -33,7 +33,6 @@ interface EventFormFieldsProps {
   errors?: Record<string, string[]>;
   eventContext?: UserEvent;
   onSubmission?: (updateData: EventUpdateData) => void;
-  // Think about this as an eventContext
 }
 
 export function EventFormFields({

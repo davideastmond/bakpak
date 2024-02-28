@@ -51,7 +51,6 @@ export function EventEditor({
     } = data;
     setIsLoading(true);
     let location = null; // This will hold the formatted location data to send to API if it's available
-    // Client side validaiton of geocoder. If it is null, don't validate, otherwise validate.
 
     if (geocoderResult !== null) {
       try {
@@ -68,14 +67,13 @@ export function EventEditor({
       }
     }
 
-    // We can validate these values at this stage
     let baseValues: any = {
       title,
       description,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       categories,
-      imageUrl,
+      imageUrl, // If this is null it means the user deleted the image.
     };
 
     try {
@@ -87,10 +85,8 @@ export function EventEditor({
       return;
     }
 
-    // If the imageUrl is the same as the imageUrl of the event, we don't need to upload the image
-    // If it's null, signal to delete image on the server?
+    // If the imageFile is not null, upload the image and get the url
     if (imageFile !== null) {
-      // Upload the image
       try {
         const cdnResolvePath = await SpacesImageInteractor.upload({
           file: imageFile,
