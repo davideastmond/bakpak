@@ -181,7 +181,6 @@ export const EventClient = {
       throw new Error('Error: Cannot create event');
     }
     const res = await response.json();
-    console.log('res', res);
     return res;
   },
 
