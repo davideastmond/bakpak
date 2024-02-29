@@ -82,8 +82,6 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
       try {
         await EventClient.registerUserForEvent(id, session?.user?._id!);
         // If ok, refetch the event to get the updated participants list
-
-        setIsLoading(false);
         await fetchEvent();
       } catch (error: any) {
         setApiError(
