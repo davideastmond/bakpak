@@ -16,6 +16,7 @@ import {
   styled,
 } from '@mui/material';
 import { signIn, signOut } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -64,9 +65,22 @@ export default function Header() {
           >
             <MenuIcon />
           </div>
-          <Typography variant='h4' color={theme.palette.primary.thirdColorIceLight}>
-            Bakpak
-          </Typography>
+          <Box display='flex'>
+            <Box mr={1}>
+              <Image src='/images/app-logos/b_logo.png' alt='Bakpak Logo' height={30} width={20} />
+            </Box>
+            <Box
+              sx={{
+                [theme.breakpoints.down(610)]: {
+                  display: 'none',
+                },
+              }}
+            >
+              <Typography variant='h4' color={theme.palette.primary.thirdColorIceLight}>
+                Bakpak
+              </Typography>
+            </Box>
+          </Box>
         </div>
         <div className={styles.authBox}>
           <Box>
