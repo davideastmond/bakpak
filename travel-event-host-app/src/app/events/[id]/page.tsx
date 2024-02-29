@@ -402,14 +402,14 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
           },
         ]}
       />
-      {userEvent && (
-        <EventEditor
-          open={eventEditorModalOpen}
-          eventContext={userEvent!}
-          onClose={() => setEventEditModalOpen(false)}
-          onUpdateActionTaken={handleEventUpdated}
-        />
-      )}
+
+      <EventEditor
+        open={eventEditorModalOpen}
+        eventContext={userEvent!}
+        onClose={() => setEventEditModalOpen(false)}
+        onUpdateActionTaken={handleEventUpdated}
+      />
+
       <Snackbar
         open={eventUpdateSnackbarOpen}
         autoHideDuration={6000}

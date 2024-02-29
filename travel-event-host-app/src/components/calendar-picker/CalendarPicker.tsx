@@ -22,7 +22,11 @@ export function CalendarPicker({
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ ...containerStyles }}>
         <DateTimePicker
-          slotProps={{ textField: { onKeyDown: (e) => e.preventDefault() } }} // This is to stop the user from entering keyboard input
+          slotProps={{
+            field: {
+              readOnly: true,
+            },
+          }} // This is to stop the user from entering keyboard input
           value={value}
           onChange={(date) => onDateTimeChange && onDateTimeChange(date)}
           disablePast={disablePast}
