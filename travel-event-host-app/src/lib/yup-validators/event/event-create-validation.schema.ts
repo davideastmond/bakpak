@@ -23,9 +23,17 @@ export const eventCreateValidationSchema: ObjectSchema<UserEventCreation> = obje
     .test('validStartDate', 'Start date should be in the future.', (value) => {
       const incommingDate = dayjs(value);
       return incommingDate.isAfter(dayjs().startOf('day'));
+    })
+    .test('valid date', 'Start date must be a valid date', (value) => {
+      const incommingDate = dayjs(value);
+      return incommingDate.isValid();
     }),
   endDate: date()
     .required('endDate is required')
+    .test('validEndDate', 'End date must be a valid date', (value) => {
+      const incommingDate = dayjs(value);
+      return incommingDate.isValid();
+    })
     .test(
       'validEndDate',
       'End date must be valid and occur after the start date',
@@ -35,6 +43,7 @@ export const eventCreateValidationSchema: ObjectSchema<UserEventCreation> = obje
         return incommingDate.isSame(startDate) || incommingDate.isAfter(startDate);
       },
     ),
+
   imageUrl: string().optional().url('imageUrl must be a valid URL').nullable() as any,
 });
 

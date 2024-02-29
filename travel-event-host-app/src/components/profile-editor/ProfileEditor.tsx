@@ -1,11 +1,7 @@
 import theme from '@/app/theme';
 
 import { profileFormHeaderSizes } from '@/app/common-styles/form-field-sizes';
-import {
-  S3PutObjectCommandParams,
-  SpacesFileUploader,
-} from '@/app/integration/spaces-file-uploader';
-import { generateFilename } from '@/app/integration/utils/generate-filename';
+import { ImageType, SpacesImageInteractor } from '@/app/integration/utils/spaces-image-interactor';
 import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-update/profile-update-validator';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
 import { SecureUser } from '@/types/secure-user';
@@ -78,24 +74,13 @@ export function ProfileEditor({
         console.error('File is not an image');
         return;
       }
-      const randomFileName: string = generateFilename(user?._id!);
-      const cdnResolvePath = `${process.env.NEXT_PUBLIC_SPACES_AVATAR_CDN_PATH}/user_avatars/${randomFileName}`;
-      /* There are a few gotchyas I've discovered when working with the AWS SDK for S3 and Digital Ocean Spaces:
-        1. The 'Bucket' property is the name of the bucket, not the full path to the bucket.
-        2. The 'Key' property is the full path to the file, including the file name. Do not include a leading forward slash.
-        3. Remember that NEXTJS environment variables are not available in the browser by default, so we need to use NEXT_PUBLIC_ to make them available.
-      */
-      const fileParams: S3PutObjectCommandParams = {
-        Bucket: process.env.NEXT_PUBLIC_SPACES_AVATAR_BUCKET_PATH!,
-        Key: `user_avatars/${randomFileName}`,
-        Body: file,
-        ACL: 'public-read',
-      };
 
       try {
-        const upLoader: SpacesFileUploader = new SpacesFileUploader();
-        await upLoader.uploadObject(fileParams);
-
+        const cdnResolvePath = await SpacesImageInteractor.upload({
+          file,
+          imageType: ImageType.USER,
+          objectNameSeed: user?._id!,
+        });
         setFormValues({ ...formValues, imageUrl: cdnResolvePath });
         onProfileUpdate &&
           onProfileUpdate({
