@@ -59,9 +59,7 @@ export function EventEditor({
           geocoderResult as google.maps.GeocoderResult,
         );
       } catch (e: any) {
-        const extractedErrors = extractValidationErrors(e);
-        console.log(extractedErrors);
-        setErrors(extractedErrors);
+        setErrors(extractValidationErrors(e));
         setIsLoading(false);
         return;
       }
@@ -86,7 +84,7 @@ export function EventEditor({
     }
 
     // If the imageFile is not null, upload the image and get the url
-    if (imageFile !== null) {
+    if (imageFile) {
       try {
         const cdnResolvePath = await SpacesImageInteractor.upload({
           file: imageFile,
