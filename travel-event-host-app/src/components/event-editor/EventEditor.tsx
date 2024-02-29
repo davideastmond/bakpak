@@ -16,7 +16,6 @@ import { useState } from 'react';
 import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { StyledDialog, StyledDialogContent, StyledDialogTitle } from '../StyledDialog/StyledDialog';
 import { EventFormFields } from '../event-form-fields/EventFormFields';
-import { Spinner } from '../spinner/Spinner';
 import { EventUpdateData } from './event-update-data';
 
 interface EventEditorProps {
@@ -59,9 +58,11 @@ export function EventEditor({
           geocoderResult as google.maps.GeocoderResult,
         );
       } catch (e: any) {
-        setErrors(extractValidationErrors(e));
+        setErrors({ ...extractValidationErrors(e), apiError: ['There were errors.'] });
         setIsLoading(false);
         return;
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -78,7 +79,7 @@ export function EventEditor({
       eventCreateValidationSchema.validateSync(baseValues, { abortEarly: false });
       eventCreationCategoriesSchema.validateSync(baseValues, { abortEarly: false });
     } catch (e: any) {
-      setErrors(extractValidationErrors(e));
+      setErrors({ ...extractValidationErrors(e), apiError: ['There were errors.'] });
       setIsLoading(false);
       return;
     }
@@ -110,7 +111,6 @@ export function EventEditor({
     }
   };
 
-  if (isLoading) return <Spinner />;
   return (
     <StyledDialog open={open}>
       <Box display='flex' justifyContent={'right'}>
@@ -144,8 +144,8 @@ export function EventEditor({
       </StyledDialogContent>
       <Box>
         {errors && (
-          <Box mb={4}>
-            <ErrorComponent fieldName='apiError' errors={errors} />{' '}
+          <Box mb={4} ml={3}>
+            <ErrorComponent fieldName='apiError' errors={errors} />
           </Box>
         )}
       </Box>
