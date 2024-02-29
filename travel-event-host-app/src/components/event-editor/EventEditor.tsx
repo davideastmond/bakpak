@@ -105,7 +105,7 @@ export function EventEditor({
     } catch (e: any) {
       console.log('Error updating event', e.message);
       setIsLoading(false);
-      setErrors({ ...errors, apiError: ['Error updating event'] });
+      setErrors({ ...errors, apiError: [`Error updating event: ${e.message}`] });
       return;
     }
   };
