@@ -11,6 +11,7 @@ import { Spinner } from '@/components/spinner/Spinner';
 import UserListContainer from '@/components/user-list-container/UserListContainer';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
+import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -277,6 +278,40 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                 </Typography>
               </Box>
             )}
+          </Box>
+          <Box className='eventDetailsContent' mt={2}>
+            <Box className='eventDetailsHeader'>
+              <Typography
+                fontSize={['1.1rem', '1.1rem', '1.5rem', '1.6rem', '1.8rem']}
+                fontWeight={'bold'}
+                color={theme.palette.primary.navyBlue}
+              >
+                In categories
+              </Typography>
+            </Box>
+            {userEvent?.categories.length === 0 && (
+              <Typography
+                fontSize={['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem']}
+                fontStyle={'italic'}
+                color={theme.palette.primary.charcoal}
+                sx={{ whiteSpace: 'pre-line' }}
+              >
+                No categories specified
+              </Typography>
+            )}
+            <Box mb={2}>
+              {/* Here we render out a readonly list of categories for this event */}
+              {userEvent?.categories.map((category, index) => (
+                <Typography
+                  fontSize={['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem']}
+                  color={theme.palette.primary.charcoal}
+                  sx={{ whiteSpace: 'pre-line' }}
+                  key={`${index}_${category}`}
+                >
+                  {CategoryDict[category]}
+                </Typography>
+              ))}
+            </Box>
           </Box>
           {apiError && (
             <Box className='apiErrorsContainer' mb={2}>
