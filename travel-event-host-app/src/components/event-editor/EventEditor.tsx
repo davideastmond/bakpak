@@ -136,6 +136,7 @@ export function EventEditor({
       <StyledDialogContent>
         <Box className='eventEditorForm'>
           <EventFormFields
+            onCancel={() => onClose()}
             eventContext={eventContext}
             errors={errors}
             onSubmission={handleEventEdit}

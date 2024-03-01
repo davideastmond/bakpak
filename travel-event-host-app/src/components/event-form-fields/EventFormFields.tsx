@@ -33,6 +33,7 @@ interface EventFormFieldsProps {
   errors?: Record<string, string[]>;
   eventContext?: UserEvent;
   onSubmission?: (updateData: EventUpdateData) => void;
+  onCancel: () => void;
 }
 
 export function EventFormFields({
@@ -40,6 +41,7 @@ export function EventFormFields({
   isLoading,
   eventContext,
   onSubmission,
+  onCancel,
 }: EventFormFieldsProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(eventContext?.imageUrl || null); // This should be url
   const [formattedAddress, setFormattedAddress] = useState<string | null>(
@@ -293,18 +295,18 @@ export function EventFormFields({
               buttonTypographyProps={textInputFieldFontSizes}
               buttonProps={{ padding: '5px' }}
             />
-            {eventContext?.imageUrl && (
-              <Button
-                onClick={() => {
-                  setFormValues((prev) => ({ ...prev, imageUrl: null }));
-                  setImagePreview(null);
-                }}
-              >
-                <Typography sx={{ color: theme.palette.primary.burntOrangeCancelError }}>
-                  Delete image
-                </Typography>
-              </Button>
-            )}
+
+            <Button
+              disabled={imagePreview === null}
+              onClick={() => {
+                setFormValues((prev) => ({ ...prev, imageUrl: null }));
+                setImagePreview(null);
+              }}
+            >
+              <Typography sx={{ color: theme.palette.primary.burntOrangeCancelError }}>
+                Delete image
+              </Typography>
+            </Button>
           </Box>
         </Box>
       </StyledFormFieldSection>
@@ -313,7 +315,7 @@ export function EventFormFields({
           <Spinner />
         ) : (
           <Box id='user-actions' mt={5} display='flex' gap={3} justifyContent={'right'}>
-            <Button sx={{ textTransform: 'none' }}>
+            <Button sx={{ textTransform: 'none' }} onClick={() => onCancel()}>
               <Typography sx={{ color: theme.palette.primary.burntOrangeCancelError }}>
                 Cancel
               </Typography>
