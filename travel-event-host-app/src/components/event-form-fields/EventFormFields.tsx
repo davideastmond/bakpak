@@ -8,6 +8,7 @@ import theme from '@/app/theme';
 import { Category } from '@/lib/category';
 import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
+
 import { Box, Button, Divider, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import Image from 'next/image';
@@ -26,8 +27,6 @@ import { ImagePicker } from '../image-picker/ImagePicker';
 import { SampleImageLoader } from '../image-picker/utils/sample-image-loader';
 import { Spinner } from '../spinner/Spinner';
 
-// Think how this component can be reused in other parts of the app
-
 interface EventFormFieldsProps {
   isLoading?: boolean;
   errors?: Record<string, string[]>;
@@ -44,6 +43,7 @@ export function EventFormFields({
   onCancel,
 }: EventFormFieldsProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(eventContext?.imageUrl || null); // This should be url
+  const [sampleImageErrors, setSampleImageErrors] = useState<Record<string, string[]>>({});
   const [formattedAddress, setFormattedAddress] = useState<string | null>(
     eventContext?.location.formattedAddress || '',
   );
@@ -72,7 +72,12 @@ export function EventFormFields({
   };
 
   const handleEventImageChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    SampleImageLoader.load(e, setFormValues, setImagePreview);
+    try {
+      setSampleImageErrors({});
+      SampleImageLoader.load(e, setFormValues, setImagePreview);
+    } catch (e: any) {
+      setSampleImageErrors({ sampleImage: [e.message] });
+    }
   };
 
   // Send the data back to parent. Validation will happen in the parent component
@@ -248,7 +253,10 @@ export function EventFormFields({
           >
             {formattedAddress}
           </Typography>
-
+          {/* Google map here. I can be conditionally rendered */}
+          <Box>
+            <Box id='googleMapEdit' width={300} height={200}></Box>
+          </Box>
           <AddressAutocomplete
             componentName={'geocoderResult'}
             placeholder='Update location...'
@@ -286,6 +294,9 @@ export function EventFormFields({
             )}
           </Box>
         )}
+        <Box>
+          <ErrorComponent fieldName='sampleImage' errors={sampleImageErrors} />
+        </Box>
         <Box maxWidth={'300px'} id='event-image-container'>
           <Box display='flex' gap={1} mt={1}>
             <ImagePicker

@@ -9,8 +9,10 @@ export const SampleImageLoader = {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.includes('image')) {
-        console.error('File is not an image');
-        return;
+        throw new Error('File is not an image');
+      }
+      if (file.size > 2097152) {
+        throw new Error('Image file is too large. It must be less than 2MB.');
       }
       setFormValuesFunction((prev: any) => ({
         ...prev,
@@ -18,8 +20,8 @@ export const SampleImageLoader = {
       }));
 
       const fileReader = new FileReader();
-      fileReader.onload = (e) => {
-        setImagePreviewFunction(e.target?.result);
+      fileReader.onload = (fileReaderEvent) => {
+        setImagePreviewFunction(fileReaderEvent.target?.result);
       };
 
       fileReader.readAsDataURL(file);
