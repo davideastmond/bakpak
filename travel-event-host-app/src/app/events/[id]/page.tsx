@@ -12,7 +12,9 @@ import UserListContainer from '@/components/user-list-container/UserListContaine
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { CategoryDict } from '@/lib/category-dictionary';
+import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
 import { UserEvent } from '@/models/user-event';
+import { Loader } from '@googlemaps/js-api-loader';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
@@ -28,6 +30,13 @@ interface EventDetailsPageProps {
     id: string;
   };
 }
+
+// Google maps loader
+const mapLoader = new Loader({
+  apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY as string,
+  version: 'weekly',
+  libraries: ['maps', 'marker'],
+});
 
 /* 
   - Event details page:
@@ -51,9 +60,42 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
 
   const [eventEditorModalOpen, setEventEditModalOpen] = useState<boolean>(false);
   const [eventUpdateSnackbarOpen, setEventUpdateSnackbarOpen] = useState<boolean>(false);
+  const [googleMap, setGoogleMap] = useState<google.maps.Map | undefined>(undefined);
   useEffect(() => {
     fetchEvent();
   }, []);
+
+  useEffect(() => {
+    const runMapLoader = async () => {
+      if (userEvent?.location?.coords) {
+        const mapOptions: google.maps.MapOptions = {
+          center: {
+            lat: CoordsHelper.toFloat(userEvent!.location.coords.lat as any) || 0,
+            lng: CoordsHelper.toFloat(userEvent!.location.coords.lng as any) || 0,
+          },
+          zoom: 15,
+          mapId: 'googleMapEventLocation',
+        };
+
+        const { Map } = await mapLoader.importLibrary('maps');
+        const { AdvancedMarkerElement } = await mapLoader.importLibrary('marker');
+
+        const mapObject = new Map(
+          document.getElementById('googleMapEventLocation') as HTMLElement,
+          mapOptions,
+        );
+        setGoogleMap(mapObject);
+
+        // Create a marker for the event location
+        new AdvancedMarkerElement({
+          position: mapOptions.center,
+          map: mapObject,
+          title: userEvent.title,
+        });
+      }
+    };
+    runMapLoader();
+  }, [userEvent]);
 
   const fetchEvent = async () => {
     try {
@@ -255,6 +297,21 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
               )}
             </Box>
           </Box>
+          {/* Google map here. I can be conditionally rendered */}
+
+          <Box mt={2}>
+            <Box
+              id='googleMapEventLocation'
+              sx={{
+                width: '100%',
+                height: googleMap ? '300px' : '0px',
+                borderRadius: '10px',
+                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                maxWidth: '1000px',
+              }}
+            ></Box>
+          </Box>
+
           <Box className='eventDetailsContainer' mt={2}>
             <Box className='eventDetailsHeader'>
               <Typography
