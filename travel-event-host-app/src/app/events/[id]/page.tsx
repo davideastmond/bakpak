@@ -11,7 +11,10 @@ import { Spinner } from '@/components/spinner/Spinner';
 import UserListContainer from '@/components/user-list-container/UserListContainer';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
+import { CategoryDict } from '@/lib/category-dictionary';
+import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
 import { UserEvent } from '@/models/user-event';
+import { Loader } from '@googlemaps/js-api-loader';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
@@ -27,6 +30,13 @@ interface EventDetailsPageProps {
     id: string;
   };
 }
+
+// Google maps loader
+const mapLoader = new Loader({
+  apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY as string,
+  version: 'weekly',
+  libraries: ['places', 'maps'],
+});
 
 /* 
   - Event details page:
@@ -50,9 +60,43 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
 
   const [eventEditorModalOpen, setEventEditModalOpen] = useState<boolean>(false);
   const [eventUpdateSnackbarOpen, setEventUpdateSnackbarOpen] = useState<boolean>(false);
+  const [googleMap, setGoogleMap] = useState<google.maps.Map | undefined>(undefined);
   useEffect(() => {
     fetchEvent();
   }, []);
+
+  useEffect(() => {
+    const runMapLoader = async () => {
+      if (userEvent?.location?.coords) {
+        const mapOptions: google.maps.MapOptions = {
+          center: {
+            lat: CoordsHelper.toFloat(userEvent!.location.coords.lat as any) || 0,
+            lng: CoordsHelper.toFloat(userEvent!.location.coords.lng as any) || 0,
+          },
+          zoom: 15,
+          mapId: 'googleMapEventLocation',
+        };
+
+        const { Map } = await mapLoader.importLibrary('maps');
+        const { AdvancedMarkerElement } = await mapLoader.importLibrary('marker');
+
+        const mapObject = new Map(
+          document.getElementById('googleMapEventLocation') as HTMLElement,
+          mapOptions,
+        );
+
+        setGoogleMap(mapObject);
+
+        // Create a marker for the event location
+        new AdvancedMarkerElement({
+          position: mapOptions.center,
+          map: mapObject,
+          title: userEvent.title,
+        });
+      }
+    };
+    runMapLoader();
+  }, [userEvent]);
 
   const fetchEvent = async () => {
     try {
@@ -81,8 +125,6 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
       try {
         await EventClient.registerUserForEvent(id, session?.user?._id!);
         // If ok, refetch the event to get the updated participants list
-
-        setIsLoading(false);
         await fetchEvent();
       } catch (error: any) {
         setApiError(
@@ -256,6 +298,21 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
               )}
             </Box>
           </Box>
+          {/* Google map here. I can be conditionally rendered */}
+
+          <Box mt={2}>
+            <Box
+              id='googleMapEventLocation'
+              sx={{
+                width: '100%',
+                height: googleMap ? '300px' : '0px',
+                borderRadius: '10px',
+                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                maxWidth: '1000px',
+              }}
+            ></Box>
+          </Box>
+
           <Box className='eventDetailsContainer' mt={2}>
             <Box className='eventDetailsHeader'>
               <Typography
@@ -277,6 +334,40 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                 </Typography>
               </Box>
             )}
+          </Box>
+          <Box className='eventDetailsContent' mt={2}>
+            <Box className='eventDetailsHeader'>
+              <Typography
+                fontSize={['1.1rem', '1.1rem', '1.5rem', '1.6rem', '1.8rem']}
+                fontWeight={'bold'}
+                color={theme.palette.primary.navyBlue}
+              >
+                In categories
+              </Typography>
+            </Box>
+            {userEvent?.categories.length === 0 && (
+              <Typography
+                fontSize={['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem']}
+                fontStyle={'italic'}
+                color={theme.palette.primary.charcoal}
+                sx={{ whiteSpace: 'pre-line' }}
+              >
+                No categories specified
+              </Typography>
+            )}
+            <Box mb={2}>
+              {/* Here we render out a readonly list of categories for this event */}
+              {userEvent?.categories.map((category, index) => (
+                <Typography
+                  fontSize={['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem']}
+                  color={theme.palette.primary.charcoal}
+                  sx={{ whiteSpace: 'pre-line' }}
+                  key={`${index}_${category}`}
+                >
+                  {CategoryDict[category]}
+                </Typography>
+              ))}
+            </Box>
           </Box>
           {apiError && (
             <Box className='apiErrorsContainer' mb={2}>
@@ -402,14 +493,15 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
           },
         ]}
       />
-      {userEvent && (
-        <EventEditor
-          open={eventEditorModalOpen}
-          eventContext={userEvent!}
-          onClose={() => setEventEditModalOpen(false)}
-          onUpdateActionTaken={handleEventUpdated}
-        />
-      )}
+
+      <EventEditor
+        open={eventEditorModalOpen}
+        eventContext={userEvent!}
+        onClose={() => setEventEditModalOpen(false)}
+        onUpdateActionTaken={handleEventUpdated}
+        mapLoader={mapLoader}
+      />
+
       <Snackbar
         open={eventUpdateSnackbarOpen}
         autoHideDuration={6000}

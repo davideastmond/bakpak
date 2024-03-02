@@ -18,6 +18,7 @@ export const StyledDialog = (props: DialogProps) => {
         '& .MuiPaper-root': {
           backgroundColor: theme.palette.primary.secondaryColorDarkBlack,
           width: '100%',
+          maxWidth: '700px',
         },
         [theme.breakpoints.down(430)]: {
           '& .MuiPaper-root': {

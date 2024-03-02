@@ -10,13 +10,13 @@ import {
 } from '@/lib/yup-validators/event/event-create-validation.schema';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
 import { UserEvent } from '@/models/user-event';
+import { Loader } from '@googlemaps/js-api-loader';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
 import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { StyledDialog, StyledDialogContent, StyledDialogTitle } from '../StyledDialog/StyledDialog';
 import { EventFormFields } from '../event-form-fields/EventFormFields';
-import { Spinner } from '../spinner/Spinner';
 import { EventUpdateData } from './event-update-data';
 
 interface EventEditorProps {
@@ -24,6 +24,7 @@ interface EventEditorProps {
   onClose: () => void;
   onUpdateActionTaken?: () => void;
   eventContext: UserEvent;
+  mapLoader: Loader;
 }
 
 export function EventEditor({
@@ -31,6 +32,7 @@ export function EventEditor({
   onClose,
   eventContext,
   onUpdateActionTaken,
+  mapLoader,
 }: EventEditorProps) {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
@@ -59,9 +61,11 @@ export function EventEditor({
           geocoderResult as google.maps.GeocoderResult,
         );
       } catch (e: any) {
-        setErrors(extractValidationErrors(e));
+        setErrors({ ...extractValidationErrors(e), apiError: ['There were errors.'] });
         setIsLoading(false);
         return;
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -78,7 +82,7 @@ export function EventEditor({
       eventCreateValidationSchema.validateSync(baseValues, { abortEarly: false });
       eventCreationCategoriesSchema.validateSync(baseValues, { abortEarly: false });
     } catch (e: any) {
-      setErrors(extractValidationErrors(e));
+      setErrors({ ...extractValidationErrors(e), apiError: ['There were errors.'] });
       setIsLoading(false);
       return;
     }
@@ -110,7 +114,6 @@ export function EventEditor({
     }
   };
 
-  if (isLoading) return <Spinner />;
   return (
     <StyledDialog open={open}>
       <Box display='flex' justifyContent={'right'}>
@@ -136,16 +139,18 @@ export function EventEditor({
       <StyledDialogContent>
         <Box className='eventEditorForm'>
           <EventFormFields
+            onCancel={() => onClose()}
             eventContext={eventContext}
             errors={errors}
             onSubmission={handleEventEdit}
+            mapLoader={mapLoader}
           />
         </Box>
       </StyledDialogContent>
       <Box>
         {errors && (
-          <Box mb={4}>
-            <ErrorComponent fieldName='apiError' errors={errors} />{' '}
+          <Box mb={4} ml={3}>
+            <ErrorComponent fieldName='apiError' errors={errors} />
           </Box>
         )}
       </Box>
