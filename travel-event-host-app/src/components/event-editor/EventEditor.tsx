@@ -10,6 +10,7 @@ import {
 } from '@/lib/yup-validators/event/event-create-validation.schema';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
 import { UserEvent } from '@/models/user-event';
+import { Loader } from '@googlemaps/js-api-loader';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -23,6 +24,7 @@ interface EventEditorProps {
   onClose: () => void;
   onUpdateActionTaken?: () => void;
   eventContext: UserEvent;
+  mapLoader: Loader;
 }
 
 export function EventEditor({
@@ -30,6 +32,7 @@ export function EventEditor({
   onClose,
   eventContext,
   onUpdateActionTaken,
+  mapLoader,
 }: EventEditorProps) {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
@@ -140,6 +143,7 @@ export function EventEditor({
             eventContext={eventContext}
             errors={errors}
             onSubmission={handleEventEdit}
+            mapLoader={mapLoader}
           />
         </Box>
       </StyledDialogContent>

@@ -35,7 +35,7 @@ interface EventDetailsPageProps {
 const mapLoader = new Loader({
   apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY as string,
   version: 'weekly',
-  libraries: ['maps', 'marker'],
+  libraries: ['places', 'maps'],
 });
 
 /* 
@@ -84,6 +84,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
           document.getElementById('googleMapEventLocation') as HTMLElement,
           mapOptions,
         );
+
         setGoogleMap(mapObject);
 
         // Create a marker for the event location
@@ -498,6 +499,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
         eventContext={userEvent!}
         onClose={() => setEventEditModalOpen(false)}
         onUpdateActionTaken={handleEventUpdated}
+        mapLoader={mapLoader}
       />
 
       <Snackbar

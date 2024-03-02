@@ -9,10 +9,12 @@ import { Category } from '@/lib/category';
 import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
 
+import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
+import { Loader } from '@googlemaps/js-api-loader';
 import { Box, Button, Divider, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../../app/common-styles/checkbox-group-styles.module.css';
 import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { AddressAutocomplete } from '../address-autocomplete/AddressAutocomplete';
@@ -33,6 +35,7 @@ interface EventFormFieldsProps {
   eventContext?: UserEvent;
   onSubmission?: (updateData: EventUpdateData) => void;
   onCancel: () => void;
+  mapLoader: Loader;
 }
 
 export function EventFormFields({
@@ -41,6 +44,7 @@ export function EventFormFields({
   eventContext,
   onSubmission,
   onCancel,
+  mapLoader,
 }: EventFormFieldsProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(eventContext?.imageUrl || null); // This should be url
   const [sampleImageErrors, setSampleImageErrors] = useState<Record<string, string[]>>({});
@@ -64,12 +68,50 @@ export function EventFormFields({
     geocoderResult: null,
   });
 
+  const [, setGoogleMap] = useState<google.maps.Map | null>(null);
+  const [, setMapMarker] = useState<google.maps.marker.AdvancedMarkerElement | null>(null);
+
   const handleInputChanged = (e: any) => {
     setFormValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
+
+  useEffect(() => {
+    const loadSampleMap = async () => {
+      let sampleMap: any;
+      const { Map } = await mapLoader.importLibrary('maps');
+      const { AdvancedMarkerElement } = await mapLoader.importLibrary('marker');
+
+      sampleMap = new Map(document.getElementById('googleMapEdit') as HTMLElement, {
+        center: {
+          lat: CoordsHelper.toFloat(eventContext?.location.coords.lat as any),
+          lng: CoordsHelper.toFloat(eventContext?.location.coords.lng as any),
+        },
+        zoom: 15,
+        mapId: 'DEMO_MAP',
+      });
+
+      setGoogleMap(sampleMap);
+      let mapMarkerElement: google.maps.marker.AdvancedMarkerElement | null =
+        new AdvancedMarkerElement({
+          position: {
+            lat: sampleMap.getCenter().lat(),
+            lng: sampleMap.getCenter().lng(),
+          },
+          map: sampleMap,
+        });
+
+      setMapMarker(mapMarkerElement);
+
+      return () => {
+        sampleMap = null;
+        mapMarkerElement = null;
+      };
+    };
+    loadSampleMap();
+  }, []);
 
   const handleEventImageChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -95,7 +137,9 @@ export function EventFormFields({
 
     onSubmission && onSubmission(updateData);
   };
+
   if (isLoading) return <Spinner />;
+
   return (
     <form>
       <StyledFormFieldSection>
@@ -103,6 +147,7 @@ export function EventFormFields({
           color={theme.palette.primary.thirdColorIceLight}
           sx={{
             fontSize: profileFormHeaderSizes,
+            fontWeight: 'bold',
           }}
         >
           Title
@@ -133,6 +178,7 @@ export function EventFormFields({
           color={theme.palette.primary.thirdColorIceLight}
           sx={{
             fontSize: profileFormHeaderSizes,
+            fontWeight: 'bold',
           }}
         >
           Description
@@ -182,6 +228,7 @@ export function EventFormFields({
               sx={{
                 fontSize: profileFormHeaderSizes,
                 alignContent: 'center',
+                fontWeight: 'bold',
               }}
             >
               Event Starts
@@ -199,6 +246,7 @@ export function EventFormFields({
               color={theme.palette.primary.thirdColorIceLight}
               sx={{
                 fontSize: profileFormHeaderSizes,
+                fontWeight: 'bold',
               }}
             >
               Event Ends
@@ -219,6 +267,7 @@ export function EventFormFields({
             color={theme.palette.primary.thirdColorIceLight}
             sx={{
               fontSize: profileFormHeaderSizes,
+              fontWeight: 'bold',
               mb: 1,
             }}
           >
@@ -239,6 +288,7 @@ export function EventFormFields({
             color={theme.palette.primary.thirdColorIceLight}
             sx={{
               fontSize: profileFormHeaderSizes,
+              fontWeight: 'bold',
               mb: 1,
             }}
           >
@@ -254,18 +304,35 @@ export function EventFormFields({
             {formattedAddress}
           </Typography>
           {/* Google map here. I can be conditionally rendered */}
-          <Box>
-            <Box id='googleMapEdit' width={300} height={200}></Box>
+          <Box mt={2} mb={2}>
+            <Box id='googleMapEdit' width={'100%'} height={200}></Box>
           </Box>
           <AddressAutocomplete
             componentName={'geocoderResult'}
             placeholder='Update location...'
             onLocationSelected={(location) => {
-              setFormValues((prev) => ({
-                ...prev,
-                geocoderResult: location as google.maps.places.PlaceResult,
-              }));
-              setFormattedAddress(location.formatted_address as string);
+              if (location) {
+                setFormValues((prev) => ({
+                  ...prev,
+                  geocoderResult: location as google.maps.places.PlaceResult,
+                }));
+                setFormattedAddress(location?.formatted_address as string);
+                // Center the map on a new location
+                setGoogleMap((prev) => {
+                  prev?.setCenter(location?.geometry?.location!);
+
+                  new google.maps.marker.AdvancedMarkerElement({
+                    position: location?.geometry?.location!,
+                    map: prev,
+                  });
+
+                  return prev;
+                });
+                setMapMarker((prev) => {
+                  (prev as any).setMap(null);
+                  return prev;
+                });
+              }
             }}
           />
           <ErrorComponent fieldName='geocoderResult' errors={errors!} />
@@ -275,11 +342,12 @@ export function EventFormFields({
       <StyledFormFieldSection mt={2}>
         {imagePreview && (
           <Box id='event-image-container'>
-            <Box>
+            <Box mb={1}>
               <Typography
                 color={theme.palette.primary.thirdColorIceLight}
                 sx={{
                   fontSize: profileFormHeaderSizes,
+                  fontWeight: 'bold',
                 }}
               >
                 Event image
