@@ -244,7 +244,7 @@ export default function Header() {
           </Box>
           <Box>
             <NavButton variant='text' color='inherit' onClick={() => setnavMenuIsOpen(false)}>
-              <Link href='/events/upcoming'>Upcoming Events</Link>
+              <Link href='/events/upcoming?category=all'>Upcoming Events</Link>
             </NavButton>
           </Box>
           <Box>
