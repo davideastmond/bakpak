@@ -1,3 +1,6 @@
+import { extractCoords } from './extract-coords';
+import { GoogleMapsTimezoneData } from './timezone-requestor';
+
 export const getLocationPostDataFromGeocoderResult = (
   geocoderResult: google.maps.GeocoderResult,
 ) => {
@@ -47,13 +50,15 @@ function extractPlaceId(geocoderResult: google.maps.GeocoderResult): string {
   return geocoderResult.place_id;
 }
 
-function extractCoords(geometry: google.maps.GeocoderGeometry): { lat: number; lng: number } {
-  return {
-    lat: geometry.location.lat(),
-    lng: geometry.location.lng(),
-  };
-}
-
 function extractFormattedAddress(geeocoderResult: google.maps.GeocoderResult): string {
   return geeocoderResult.formatted_address;
 }
+
+export const getTimezoneDataFromTimezoneResult = (
+  googleTimezoneData: GoogleMapsTimezoneData,
+): { id: string | undefined; name: string | undefined } => {
+  return {
+    id: googleTimezoneData.timeZoneId,
+    name: googleTimezoneData.timeZoneName,
+  };
+};

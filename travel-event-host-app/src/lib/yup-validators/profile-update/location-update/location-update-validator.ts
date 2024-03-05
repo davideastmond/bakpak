@@ -11,4 +11,8 @@ export const locationUpdateValidationSchema = object({
     lat: number().required(),
     lng: number().required(),
   }).required(),
+  timezone: object({
+    id: string().required(),
+    name: string().required(),
+  }).required(),
 }).required();

@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   // We expect country, state, city, place_id, formattedAddress, coords from the request body and they shall be patched 😏
   const user = await UserRepository.findById(id);
   if (user) {
-    const { country, state, city, place_id, formattedAddress, coords } = requestBody;
+    const { country, state, city, place_id, formattedAddress, coords, timezone } = requestBody;
     user.location = {
       country,
       state,
@@ -28,6 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       place_id,
       formattedAddress,
       coords,
+      timezone,
     };
     await user.save();
     return NextResponse.json({ message: `User ${id} updated.` }, { status: 200 });

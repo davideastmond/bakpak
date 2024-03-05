@@ -13,7 +13,12 @@ export const AuthClient = {
     email: string;
     password: string;
     lastName: string;
-    location?: { country?: string; state?: string; city?: string };
+    location?: {
+      country?: string;
+      state?: string;
+      city?: string;
+      timezone?: { id: string; name: string };
+    };
   }): Promise<void> => {
     const req = await fetch('/api/auth/register', {
       method: 'POST',
