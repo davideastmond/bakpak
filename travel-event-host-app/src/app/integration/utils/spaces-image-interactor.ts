@@ -15,6 +15,13 @@ export interface SpacesImageInteractorParams {
   imageType: ImageType;
 }
 
+/**
+ * Interactor to upload images to s3
+ * @param file - File object from a form input
+ * @param imageType either a user avatar or event image
+ * @param objectNameSeed - a unique identifier for the object
+ * @return string - image's uploaded url (CDN)
+ */
 export const SpacesImageInteractor = {
   upload: async ({
     file,
