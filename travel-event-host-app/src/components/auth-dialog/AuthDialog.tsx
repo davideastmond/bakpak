@@ -67,12 +67,10 @@ export default function AuthDialog(props: AuthDialogProps) {
   const handleSubmit = async () => {
     // Validate the signup form
     if (props.authDialogType === 'signup') {
-      console.log('49 signup', formValues);
       try {
         signUpValidationSchema.validateSync(formValues, { abortEarly: false });
       } catch (err: any) {
         const validationErrors = extractValidationErrors(err);
-        console.log('54 validationError', validationErrors);
         setErrors(validationErrors);
         return;
       }
