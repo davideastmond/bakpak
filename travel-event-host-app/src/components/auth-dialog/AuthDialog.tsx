@@ -3,6 +3,8 @@
 import { AuthClient } from '@/app/clients/auth-client/auth-client';
 import { SignInAPIResponse } from '@/app/clients/auth-client/signin-api-response';
 import { getLocationPostDataFromGeocoderResult } from '@/app/integration/google-maps-api/address-helper';
+import { extractCoords } from '@/app/integration/google-maps-api/extract-coords';
+import { TimezoneRequestor } from '@/app/integration/google-maps-api/timezone-requestor';
 import { signInValidationSchema } from '@/lib/yup-validators/signin/signin-validator';
 import { signUpValidationSchema } from '@/lib/yup-validators/signup/signup-validators';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
@@ -76,6 +78,10 @@ export default function AuthDialog(props: AuthDialogProps) {
       }
 
       setIsLoading(true);
+      // Get time zone data from google cloud API
+      const coords = extractCoords((formValues.location as google.maps.GeocoderResult).geometry);
+
+      const timezoneData = await TimezoneRequestor.getTimezoneByCoords(coords, Date.now() / 1000);
 
       // Try to register the user. Google location data needs to be adapted.
       try {
@@ -89,6 +95,10 @@ export default function AuthDialog(props: AuthDialogProps) {
             ...getLocationPostDataFromGeocoderResult(
               formValues.location as google.maps.GeocoderResult,
             ),
+            timezone: {
+              id: timezoneData.timeZoneId!,
+              name: timezoneData.timeZoneName!,
+            },
           },
         });
         console.info('Registration successful');

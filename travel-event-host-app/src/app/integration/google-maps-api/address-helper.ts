@@ -42,7 +42,9 @@ function extractCity(
     (component) =>
       component.types.includes('locality') ||
       component.types.includes('sublocality_level_1') ||
-      component.types.includes('sublocality'),
+      component.types.includes('sublocality') ||
+      component.types.includes('country') ||
+      component.types.includes('political'),
   )!;
 }
 
