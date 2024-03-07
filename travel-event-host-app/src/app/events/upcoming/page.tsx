@@ -2,12 +2,13 @@
 'use client';
 import { EventClient } from '@/app/clients/event/event-client';
 import { EventsSection } from '@/components/events-section/Events-section';
+import { useAppContext } from '@/lib/app-context';
 import { Category } from '@/lib/category';
 import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
 import { EventTimeLine } from '@/types/event-timeline';
 import { Box } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // This page can be a place for all upcoming events to be displayed
@@ -18,12 +19,16 @@ export default function UpcomingEventsPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<UserEvent[]>([]);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [title, setTitle] = useState<string>('Upcoming events');
-
+  const { dispatch } = useAppContext();
   useEffect(() => {
     fetchUpcomingUserEvents();
   }, [pageNumber]);
 
+  useEffect(() => {
+    dispatch({ type: 'SET_IDLE' });
+  }, []);
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const fetchUpcomingUserEvents = async () => {
     const category = searchParams.get('category');
@@ -55,6 +60,11 @@ export default function UpcomingEventsPage() {
     }
   };
 
+  const handleEventCardClicked = (eventId: string) => {
+    setIsLoading(true);
+    router.push(`/events/${eventId}`);
+  };
+
   return (
     <Box padding='5%'>
       <EventsSection
@@ -62,6 +72,7 @@ export default function UpcomingEventsPage() {
         hostedEvents={upcomingEvents}
         onLoadMoreEventsButtonClicked={() => setPageNumber(pageNumber + 1)}
         isLoading={isLoading}
+        onEventCardClicked={handleEventCardClicked}
       />
     </Box>
   );

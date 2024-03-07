@@ -7,6 +7,7 @@ import theme from '@/app/theme';
 import { EventsSection } from '@/components/events-section/Events-section';
 import { ProfileEditor } from '@/components/profile-editor/ProfileEditor';
 import { Spinner } from '@/components/spinner/Spinner';
+import { useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { UserEvent } from '@/models/user-event';
@@ -37,11 +38,14 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
   const [upcomingEventsPageNumber, setUpcomingEventsPageNumber] = useState<number>(1);
   const [pastEventsPageNumber, setPastEventsPageNumber] = useState<number>(1);
   const router = useRouter();
+  const { dispatch } = useAppContext();
+
   useEffect(() => {
     fetchUser();
     fetchUserUpcomingEvents();
     fetchUserHostedEvents();
     fetchUserPastEvents();
+    dispatch({ type: 'SET_IDLE' });
   }, []);
 
   useEffect(() => {

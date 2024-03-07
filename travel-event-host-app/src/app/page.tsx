@@ -3,6 +3,7 @@ import { CategoriesSection } from '@/components/categories-section/CategoriesSec
 import { CreateEventSection } from '@/components/create-event-section/Create-event-section';
 import { EventsSection } from '@/components/events-section/Events-section';
 import { HeroSection } from '@/components/hero/Hero-Section';
+import { useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { UserEvent } from '@/models/user-event';
@@ -18,11 +19,16 @@ export default function Home() {
   const [pageNumber, setPageNumber] = useState<number>(1);
 
   const { status } = useAuthContext();
+  const { dispatch } = useAppContext();
   const router = useRouter();
 
   useEffect(() => {
     fetchUserEvents();
   }, [pageNumber]); // loading of user events on the home page
+
+  useEffect(() => {
+    dispatch({ type: 'SET_IDLE' });
+  }, []);
 
   const fetchUserEvents = async () => {
     setIsLoading(true);
@@ -47,6 +53,9 @@ export default function Home() {
 
     router.push('/auth/signin');
   };
+  const handleEventCardClicked = (eventId: string) => {
+    router.push(`/events/${eventId}`);
+  };
 
   return (
     <Box>
@@ -58,6 +67,7 @@ export default function Home() {
             hostedEvents={userEvents}
             onLoadMoreEventsButtonClicked={() => setPageNumber(pageNumber + 1)}
             isLoading={isLoading}
+            onEventCardClicked={handleEventCardClicked}
           />
         </Box>
         <Box mb={5}>

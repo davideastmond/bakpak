@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { EventCard } from '../event/event-card/Event-card';
 
+import { useAppContext } from '@/lib/app-context';
 import { Category } from '@/lib/category';
 import {
   generateInitialCheckboxState,
@@ -31,7 +32,7 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
   );
   const [isFilterBoxOpen, setIsFilterBoxOpen] = useState<boolean>(false);
   const router = useRouter();
-
+  const { dispatch } = useAppContext();
   const handleSearch = (searchInput: string) => {
     const url = `/events/search/${searchInput}`; // Construct the URL
     localStorage.setItem('categoryCheckboxState', JSON.stringify(categoryCheckboxState));
@@ -48,6 +49,10 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
     };
     executeEventSearch();
   }, [categoryCheckboxState, keyword]);
+
+  useEffect(() => {
+    dispatch({ type: 'SET_IDLE' });
+  }, []);
 
   return (
     <section className={styles.section}>

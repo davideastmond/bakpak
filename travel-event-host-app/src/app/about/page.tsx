@@ -1,12 +1,20 @@
 'use client';
+import { useAppContext } from '@/lib/app-context';
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { textInputFieldFontSizes } from '../common-styles/form-field-sizes';
 import theme from '../theme';
 import styles from './styles.module.css';
 
 export default function AboutUsPage() {
+  const { dispatch } = useAppContext();
+
+  useEffect(() => {
+    dispatch({ type: 'SET_IDLE' });
+  }, []);
+
   return (
     <Box className={styles.mainContentBody}>
       <Box

@@ -279,7 +279,11 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                       fontWeight={'semibold'}
                       fontSize={['0.8rem', '1rem', '1.2rem', '1.4rem', '1.6rem']}
                     >
-                      {formatDateRange(userEvent.startDate, userEvent.endDate)}
+                      {formatDateRange(
+                        userEvent.startDate,
+                        userEvent.endDate,
+                        userEvent.location.timezone?.name,
+                      )}
                     </Typography>
                   </Box>
                   <Box>
@@ -538,13 +542,15 @@ const StyledContentContainer = styled(Box)(({ theme }) => ({}));
 
 // This function will format dates to be more readable when they are on the same day so the end date just
 // shows the time. When the start and end days are different, it will show the full date and time for both.
-function formatDateRange(start: Date, end: Date): string {
+function formatDateRange(start: Date, end: Date, timezoneName?: string): string {
   if (!start || !end) return '';
-
+  if (!timezoneName) {
+    timezoneName = '(Unknown Timezone)';
+  }
   const startDate = dayjs(start);
   const endDate = dayjs(end);
   if (startDate.isSame(endDate, 'day')) {
-    return `${startDate.format('D MMM, YYYY HH:mm A')} to ${endDate.format('HH:mm A')}`;
+    return `${startDate.format('D MMM, YYYY HH:mm A')} to ${endDate.format('HH:mm A')} ${timezoneName}`;
   }
-  return `${startDate.format('D MMM, YYYY HH:mm A')} to ${endDate.format('D MMM, YYYY HH:mm A')}`;
+  return `${startDate.format('D MMM, YYYY HH:mm A')} to ${endDate.format('D MMM, YYYY HH:mm A')} ${timezoneName} `;
 }
