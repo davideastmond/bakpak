@@ -1,12 +1,13 @@
 'use client';
 import theme from '@/app/theme';
-import { useAppContext } from '@/lib/app-context';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { Language } from '@/lib/language';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
+  Backdrop,
   Box,
   Button,
   FormControl,
@@ -38,16 +39,16 @@ export function Header() {
     setnavMenuIsOpen(false);
     // User is authenticated, so we can navigate to their user portal
     if (status === AuthStatus.Authenticated && session?.user) {
-      dispatch({ type: 'SET_LOADING' });
+      dispatch!({ type: IAppActionType.SET_LOADING });
       router.push(`/users/${session.user._id}`);
     } else {
       // User is not authenticated, so we should navigate to the login page
-      dispatch({ type: 'SET_LOADING' });
+      dispatch!({ type: IAppActionType.SET_LOADING });
       router.push('/auth/signin');
     }
   };
 
-  if (status === AuthStatus.Loading || appStatus === 'loading')
+  if (status === AuthStatus.Loading)
     return (
       <Box
         display='flex'
@@ -63,6 +64,7 @@ export function Header() {
   return (
     <header className={styles.header}>
       <div>
+        <Backdrop open={appStatus === 'loading'} />
         <div className={styles.logoBox}>
           <div
             onClick={() => setnavMenuIsOpen(true)}
@@ -248,7 +250,7 @@ export function Header() {
               color='inherit'
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch({ type: 'SET_LOADING' });
+                dispatch!({ type: IAppActionType.SET_LOADING });
               }}
               disabled={urlPathname === '/'}
             >
@@ -261,7 +263,7 @@ export function Header() {
               color='inherit'
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch({ type: 'SET_LOADING' });
+                dispatch!({ type: IAppActionType.SET_LOADING });
               }}
               disabled={urlPathname === '/events/upcoming'}
             >
@@ -285,7 +287,7 @@ export function Header() {
               disabled={urlPathname === '/events/create'}
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch({ type: 'SET_LOADING' });
+                dispatch!({ type: IAppActionType.SET_LOADING });
               }}
             >
               <Link href='/events/create'>Create Event</Link>
@@ -298,7 +300,7 @@ export function Header() {
               disabled={urlPathname === '/about'}
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch({ type: 'SET_LOADING' });
+                dispatch!({ type: IAppActionType.SET_LOADING });
               }}
             >
               <Link href='/about'>About Us</Link>

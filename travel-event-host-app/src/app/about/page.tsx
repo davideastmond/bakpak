@@ -1,5 +1,5 @@
 'use client';
-import { useAppContext } from '@/lib/app-context';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ export default function AboutUsPage() {
   const { dispatch } = useAppContext();
 
   useEffect(() => {
-    dispatch({ type: 'SET_IDLE' });
+    dispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   return (

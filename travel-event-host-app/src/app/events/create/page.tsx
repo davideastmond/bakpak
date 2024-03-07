@@ -25,7 +25,7 @@ import { CustomTextField, StyledFormFieldSection } from '@/components/custom-fie
 import { ImagePicker } from '@/components/image-picker/ImagePicker';
 import { SampleImageLoader } from '@/components/image-picker/utils/sample-image-loader';
 import { Spinner } from '@/components/spinner/Spinner';
-import { useAppContext } from '@/lib/app-context';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { Category } from '@/lib/category';
@@ -36,7 +36,7 @@ import {
 } from '@/lib/yup-validators/event/event-create-validation.schema';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Box, Button, Typography } from '@mui/material';
+import { Backdrop, Box, Button, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -97,7 +97,7 @@ export default function CreateEventPage() {
   // Load a map
   useEffect(() => {
     let mapOptions: any;
-    dispatch({ type: 'SET_IDLE' });
+    dispatch!({ type: IAppActionType.SET_IDLE });
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -266,6 +266,7 @@ export default function CreateEventPage() {
       marginLeft={[0, '10%', '15%', '20%', '30%']}
       marginRight={[0, '10%', '15%', '20%', '30%']}
     >
+      <Backdrop open={isLoading} />
       <Box
         className='eventCreate_styledForm'
         width={'100%'}

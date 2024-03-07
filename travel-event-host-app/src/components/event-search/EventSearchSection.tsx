@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { EventCard } from '../event/event-card/Event-card';
 
-import { useAppContext } from '@/lib/app-context';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { Category } from '@/lib/category';
 import {
   generateInitialCheckboxState,
@@ -51,7 +51,7 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
   }, [categoryCheckboxState, keyword]);
 
   useEffect(() => {
-    dispatch({ type: 'SET_IDLE' });
+    dispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   return (

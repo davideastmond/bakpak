@@ -18,7 +18,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
-import { Alert, Box, Chip, Snackbar, Typography, styled } from '@mui/material';
+import { Alert, Backdrop, Box, Chip, Snackbar, Typography, styled } from '@mui/material';
 import dayjs from 'dayjs';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
@@ -187,6 +187,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
 
   return (
     <Box>
+      <Backdrop open={isLoading} />
       <Suspense fallback={<Spinner />}>
         <StyledContentContainer
           p={'10%'}

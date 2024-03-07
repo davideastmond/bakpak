@@ -7,13 +7,13 @@ import theme from '@/app/theme';
 import { EventsSection } from '@/components/events-section/Events-section';
 import { ProfileEditor } from '@/components/profile-editor/ProfileEditor';
 import { Spinner } from '@/components/spinner/Spinner';
-import { useAppContext } from '@/lib/app-context';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { UserEvent } from '@/models/user-event';
 import { EventTimeLine } from '@/types/event-timeline';
 import { SecureUser } from '@/types/secure-user';
-import { Alert, Box } from '@mui/material';
+import { Alert, Backdrop, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -45,7 +45,7 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
     fetchUserUpcomingEvents();
     fetchUserHostedEvents();
     fetchUserPastEvents();
-    dispatch({ type: 'SET_IDLE' });
+    dispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   useEffect(() => {
@@ -173,6 +173,7 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
 
   return (
     <Box>
+      <Backdrop open={isLoading} />
       {error && <Alert severity='error'>{error}</Alert>}
       <Box
         className={'userProfileHeaderSection'}

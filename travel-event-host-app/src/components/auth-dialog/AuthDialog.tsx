@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import {
+  Backdrop,
   Box,
   Button,
   Chip,
@@ -47,11 +48,14 @@ export default function AuthDialog(props: AuthDialogProps) {
   const [formValues, setFormValues] = useState<
     Record<string, string | google.maps.GeocoderResult | null>
   >({ firstName: '', lastName: '', email: '', password1: '', password2: '', location: null });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [apiErrors, setApiErrors] = useState<Record<string, string[]> | undefined>(undefined); // Errors returned from the API [
+  const [apiErrors, setApiErrors] = useState<Record<string, string[]> | undefined>(undefined); // Errors returned from the API
+
   const theme = useTheme();
   const searchParams = useSearchParams();
   const router = useRouter();
+
   useEffect(() => {
     const errorMessage = searchParams.get('error');
 
@@ -159,6 +163,7 @@ export default function AuthDialog(props: AuthDialogProps) {
 
   return (
     <StyledDialog open={props.open}>
+      <Backdrop open={isLoading} />
       <>
         <Box display='flex' justifyContent={'right'}>
           <IconButton onClick={() => router.back()}>

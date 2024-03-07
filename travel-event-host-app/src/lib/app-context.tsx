@@ -1,30 +1,32 @@
 'use client';
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { Dispatch, createContext, useContext, useReducer } from 'react';
 interface IAppContext {
   appStatus: 'loading' | 'idle';
+  dispatch: Dispatch<IAppAction> | null;
 }
 
 interface IAppAction {
-  type: IAction;
+  type: IAppActionType;
   payload?: any;
 }
 
-export enum IAction {
+export enum IAppActionType {
   SET_LOADING = 'SET_LOADING',
   SET_IDLE = 'SET_IDLE',
 }
 
 const initialState: IAppContext = {
   appStatus: 'idle',
+  dispatch: null,
 };
 
-const AppContext = createContext<any>(initialState);
+const AppContext = createContext<IAppContext>(initialState);
 
 function appReducer(state: IAppContext, action: IAppAction): IAppContext {
   switch (action.type) {
-    case IAction.SET_LOADING:
+    case IAppActionType.SET_LOADING:
       return { ...state, appStatus: 'loading' };
-    case IAction.SET_IDLE:
+    case IAppActionType.SET_IDLE:
       return { ...state, appStatus: 'idle' };
     default:
       return state;

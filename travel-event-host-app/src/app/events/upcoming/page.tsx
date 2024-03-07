@@ -2,12 +2,12 @@
 'use client';
 import { EventClient } from '@/app/clients/event/event-client';
 import { EventsSection } from '@/components/events-section/Events-section';
-import { useAppContext } from '@/lib/app-context';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { Category } from '@/lib/category';
 import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
 import { EventTimeLine } from '@/types/event-timeline';
-import { Box } from '@mui/material';
+import { Backdrop, Box } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -25,8 +25,9 @@ export default function UpcomingEventsPage() {
   }, [pageNumber]);
 
   useEffect(() => {
-    dispatch({ type: 'SET_IDLE' });
+    dispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -67,6 +68,7 @@ export default function UpcomingEventsPage() {
 
   return (
     <Box padding='5%'>
+      <Backdrop open={isLoading} />
       <EventsSection
         title={title}
         hostedEvents={upcomingEvents}
