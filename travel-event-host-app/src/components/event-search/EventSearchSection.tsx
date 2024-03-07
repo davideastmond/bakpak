@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 import { EventClient } from '@/app/clients/event/event-client';
 
 import { UserEvent } from '@/models/user-event';
-import { Box, MenuItem, Select } from '@mui/material';
+import { Box, Button, MenuItem, Select } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { EventCard } from '../event/event-card/Event-card';
@@ -78,9 +78,9 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
             <MenuItem value='Date'>Date</MenuItem>
           </Select>
         </Box>
-        <p onClick={() => setIsFilterBoxOpen(true)} className={styles.filterBtn}>
-          Filters
-        </p>
+        <Button className={styles.filterBtn} onClick={() => setIsFilterBoxOpen(true)}>
+          Show Filters
+        </Button>
         <Suspense fallback={<Spinner />}>
           <ul className={styles.eventsGrid}>
             {resultEventList.length > 0 ? (

@@ -26,7 +26,7 @@
   margin-top: 3em;
 }
 .filterBtn {
-  display: none;
+  display: none !important;
   margin: 1em 0;
   text-align: center;
   font-weight: 500;
@@ -61,7 +61,7 @@
     display: block !important;
   }
   .filterBtn {
-    display: block;
+    display: block !important;
   }
   .eventsGrid {
     padding-top: 0;

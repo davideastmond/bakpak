@@ -65,5 +65,9 @@ export const eventLocationRouteValidationSchema = object({
       lat: number().required('lat is required').typeError('lat must be a number'),
       lng: number().required('lng is required').typeError('lng must be a number'),
     }),
+    timezone: object({
+      id: string().required(),
+      name: string().required(),
+    }),
   }),
 });
