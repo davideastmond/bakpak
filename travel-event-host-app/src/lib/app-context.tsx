@@ -2,7 +2,7 @@
 import React, { Dispatch, createContext, useContext, useReducer } from 'react';
 interface IAppContext {
   appStatus: 'loading' | 'idle';
-  dispatch: Dispatch<IAppAction> | null;
+  appDispatch: Dispatch<IAppAction> | null;
 }
 
 interface IAppAction {
@@ -17,7 +17,7 @@ export enum IAppActionType {
 
 const initialState: IAppContext = {
   appStatus: 'idle',
-  dispatch: null,
+  appDispatch: null,
 };
 
 const AppContext = createContext<IAppContext>(initialState);
@@ -37,7 +37,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   return (
-    <AppContext.Provider value={{ ...state, dispatch: dispatch }}>{children}</AppContext.Provider>
+    <AppContext.Provider value={{ ...state, appDispatch: dispatch }}>
+      {children}
+    </AppContext.Provider>
   );
 };
 

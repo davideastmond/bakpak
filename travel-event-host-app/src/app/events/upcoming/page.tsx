@@ -19,13 +19,13 @@ export default function UpcomingEventsPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<UserEvent[]>([]);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [title, setTitle] = useState<string>('Upcoming events');
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
   useEffect(() => {
     fetchUpcomingUserEvents();
   }, [pageNumber]);
 
   useEffect(() => {
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   const searchParams = useSearchParams();

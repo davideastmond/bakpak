@@ -4,10 +4,10 @@ import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useEffect } from 'react';
 
 export default function SignInPage() {
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
 
   useEffect(() => {
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   return <AuthDialog open={true} authDialogType={'signin'} />;

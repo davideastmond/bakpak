@@ -38,14 +38,14 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
   const [upcomingEventsPageNumber, setUpcomingEventsPageNumber] = useState<number>(1);
   const [pastEventsPageNumber, setPastEventsPageNumber] = useState<number>(1);
   const router = useRouter();
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
 
   useEffect(() => {
     fetchUser();
     fetchUserUpcomingEvents();
     fetchUserHostedEvents();
     fetchUserPastEvents();
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   useEffect(() => {

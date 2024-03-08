@@ -19,7 +19,7 @@ export default function Home() {
   const [pageNumber, setPageNumber] = useState<number>(1);
 
   const { status } = useAuthContext();
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Home() {
   }, [pageNumber]); // loading of user events on the home page
 
   useEffect(() => {
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   const fetchUserEvents = async () => {
@@ -46,6 +46,7 @@ export default function Home() {
   const handleCreateEventButtonClicked = async () => {
     // If the user is authenticated, redirect to the create event page
     // otherwise, redirect to the login page
+    appDispatch!({ type: IAppActionType.SET_LOADING });
     if (status === AuthStatus.Authenticated) {
       router.push('/events/create');
       return;

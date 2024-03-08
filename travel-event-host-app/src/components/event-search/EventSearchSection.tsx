@@ -32,7 +32,7 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
   );
   const [isFilterBoxOpen, setIsFilterBoxOpen] = useState<boolean>(false);
   const router = useRouter();
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
   const handleSearch = (searchInput: string) => {
     const url = `/events/search/${searchInput}`; // Construct the URL
     localStorage.setItem('categoryCheckboxState', JSON.stringify(categoryCheckboxState));
@@ -51,7 +51,7 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
   }, [categoryCheckboxState, keyword]);
 
   useEffect(() => {
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   return (

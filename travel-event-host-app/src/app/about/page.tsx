@@ -9,10 +9,10 @@ import theme from '../theme';
 import styles from './styles.module.css';
 
 export default function AboutUsPage() {
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
 
   useEffect(() => {
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   return (

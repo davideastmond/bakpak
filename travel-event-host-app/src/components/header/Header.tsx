@@ -32,18 +32,18 @@ export function Header() {
   const [lang, setLang] = useState<Language>(Language.En);
   const [navMenuIsOpen, setnavMenuIsOpen] = useState<boolean>(false);
   const router = useRouter();
-  const { appStatus, dispatch } = useAppContext();
+  const { appStatus, appDispatch } = useAppContext();
   const urlPathname = usePathname();
 
   const navigateToMyProfile = () => {
     setnavMenuIsOpen(false);
     // User is authenticated, so we can navigate to their user portal
     if (status === AuthStatus.Authenticated && session?.user) {
-      dispatch!({ type: IAppActionType.SET_LOADING });
+      appDispatch!({ type: IAppActionType.SET_LOADING });
       router.push(`/users/${session.user._id}`);
     } else {
       // User is not authenticated, so we should navigate to the login page
-      dispatch!({ type: IAppActionType.SET_LOADING });
+      appDispatch!({ type: IAppActionType.SET_LOADING });
       router.push('/auth/signin');
     }
   };
@@ -250,7 +250,7 @@ export function Header() {
               color='inherit'
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch!({ type: IAppActionType.SET_LOADING });
+                appDispatch!({ type: IAppActionType.SET_LOADING });
               }}
               disabled={urlPathname === '/'}
             >
@@ -263,7 +263,7 @@ export function Header() {
               color='inherit'
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch!({ type: IAppActionType.SET_LOADING });
+                appDispatch!({ type: IAppActionType.SET_LOADING });
               }}
               disabled={urlPathname === '/events/upcoming'}
             >
@@ -287,7 +287,7 @@ export function Header() {
               disabled={urlPathname === '/events/create'}
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch!({ type: IAppActionType.SET_LOADING });
+                appDispatch!({ type: IAppActionType.SET_LOADING });
               }}
             >
               <Link href='/events/create'>Create Event</Link>
@@ -300,7 +300,7 @@ export function Header() {
               disabled={urlPathname === '/about'}
               onClick={() => {
                 setnavMenuIsOpen(false);
-                dispatch!({ type: IAppActionType.SET_LOADING });
+                appDispatch!({ type: IAppActionType.SET_LOADING });
               }}
             >
               <Link href='/about'>About Us</Link>

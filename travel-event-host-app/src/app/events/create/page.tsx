@@ -93,11 +93,11 @@ export default function CreateEventPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { status, session } = useAuthContext();
   const router = useRouter();
-  const { dispatch } = useAppContext();
+  const { appDispatch } = useAppContext();
   // Load a map
   useEffect(() => {
     let mapOptions: any;
-    dispatch!({ type: IAppActionType.SET_IDLE });
+    appDispatch!({ type: IAppActionType.SET_IDLE });
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
