@@ -3,6 +3,7 @@ import { CategoriesSection } from '@/components/categories-section/CategoriesSec
 import { CreateEventSection } from '@/components/create-event-section/Create-event-section';
 import { EventsSection } from '@/components/events-section/Events-section';
 import { HeroSection } from '@/components/hero/Hero-Section';
+import { Spinner } from '@/components/spinner/Spinner';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
@@ -61,7 +62,9 @@ export default function Home() {
 
   return (
     <Box>
-      <Backdrop open={isLoading} />
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <Box id='enclosure' marginLeft={[0, 0, '10%', '20%']} marginRight={[0, 0, '10%', '20%']}>
         <HeroSection />
         <Box mb={5} mt={5}>

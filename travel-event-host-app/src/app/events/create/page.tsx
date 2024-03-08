@@ -266,7 +266,9 @@ export default function CreateEventPage() {
       marginLeft={[0, '10%', '15%', '20%', '30%']}
       marginRight={[0, '10%', '15%', '20%', '30%']}
     >
-      <Backdrop open={isLoading} />
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <Box
         className='eventCreate_styledForm'
         width={'100%'}

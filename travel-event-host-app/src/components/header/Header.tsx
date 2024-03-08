@@ -64,7 +64,9 @@ export function Header() {
   return (
     <header className={styles.header}>
       <div>
-        <Backdrop open={appStatus === 'loading'} />
+        <Backdrop open={appStatus === 'loading'}>
+          <Spinner />
+        </Backdrop>
         <div className={styles.logoBox}>
           <div
             onClick={() => setnavMenuIsOpen(true)}

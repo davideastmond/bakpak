@@ -2,6 +2,7 @@
 'use client';
 import { EventClient } from '@/app/clients/event/event-client';
 import { EventsSection } from '@/components/events-section/Events-section';
+import { Spinner } from '@/components/spinner/Spinner';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { Category } from '@/lib/category';
 import { CategoryDict } from '@/lib/category-dictionary';
@@ -68,7 +69,9 @@ export default function UpcomingEventsPage() {
 
   return (
     <Box padding='5%'>
-      <Backdrop open={isLoading} />
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <EventsSection
         title={title}
         hostedEvents={upcomingEvents}

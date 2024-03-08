@@ -32,6 +32,7 @@ import {
   StyledDialogContent,
   StyledDialogTitle,
 } from '../StyledDialog/StyledDialog';
+import { Spinner } from '../spinner/Spinner';
 import { SignInFields } from './sign-in-fields/SignInFields';
 import { SignUpFields } from './sign-up-fields/SignUpFields';
 /**
@@ -163,7 +164,9 @@ export default function AuthDialog(props: AuthDialogProps) {
 
   return (
     <StyledDialog open={props.open}>
-      <Backdrop open={isLoading} />
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <>
         <Box display='flex' justifyContent={'right'}>
           <IconButton onClick={() => router.back()}>

@@ -173,7 +173,9 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
 
   return (
     <Box>
-      <Backdrop open={isLoading} />
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       {error && <Alert severity='error'>{error}</Alert>}
       <Box
         className={'userProfileHeaderSection'}
