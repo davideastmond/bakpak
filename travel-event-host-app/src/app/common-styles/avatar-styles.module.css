@@ -1,7 +1,7 @@
 .userAvatar {
   position: relative !important;
-  width: 80px !important;
-  height: 80px !important;
+  width: 70px !important;
+  height: 70px !important;
 }
 
 @media only screen and (min-width: 600px) {

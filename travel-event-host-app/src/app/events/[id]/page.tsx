@@ -5,6 +5,8 @@ import theme from '@/app/theme';
 import { CommonButton } from '@/components/common-button/Common-Button';
 
 import { UserClient } from '@/app/clients/user/user-client';
+import { CustomGenericMuiAvatar } from '@/components/avatar/custom-generic-user-avatar/CustomGenericUserAvatar';
+import UserAvatar from '@/components/avatar/user-avatar/UserAvatar';
 import { ConfirmationDialog } from '@/components/confirmation-dialog/ConfirmationDialog';
 import { EventEditor } from '@/components/event-editor/EventEditor';
 import { Spinner } from '@/components/spinner/Spinner';
@@ -14,6 +16,7 @@ import { AuthStatus } from '@/lib/auth-status';
 import { CategoryDict } from '@/lib/category-dictionary';
 import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
 import { UserEvent } from '@/models/user-event';
+import { SecureUser } from '@/types/secure-user';
 import { Loader } from '@googlemaps/js-api-loader';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -23,6 +26,7 @@ import dayjs from 'dayjs';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import { Dispatch, SetStateAction, Suspense, useEffect, useState } from 'react';
+import avatarStyles from '../../../app/common-styles/avatar-styles.module.css';
 import { isEventInPast } from '../helpers/event-utils';
 import styles from './styles.module.css';
 interface EventDetailsPageProps {
@@ -50,7 +54,8 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
   const [userEvent, setUserEvent] = useState<UserEvent | undefined>(undefined); // This is the event context for this page
 
   // This is the event host user context.
-  const [eventHostName, setEventHostName] = useState<string | undefined>(undefined);
+  const [eventHost, setEventHost] = useState<Partial<SecureUser> | undefined>(undefined);
+
   const [hasImageError, setHasImageError] = useState<boolean>(false);
   const [apiError, setApiError] = useState<string | undefined>(undefined);
   const [confirmUnregisterDialogOpen, setConfirmUnregisterDialogOpen] = useState<boolean>(false);
@@ -106,9 +111,9 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
       const eventHostInfo = await UserClient.getUserById(fetchedEventData?.eventCreatorId!, [
         'firstName',
         'lastName',
+        'imageUrl',
       ]);
-
-      setEventHostName(`${eventHostInfo?.firstName} ${eventHostInfo?.lastName}`);
+      setEventHost(eventHostInfo);
 
       const fetchedEventParticipants = await EventClient.getEventParticipants(id);
       setEventParticipants(fetchedEventParticipants.users);
@@ -216,12 +221,19 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
             >
               Hosted by
             </Typography>
-            <Typography
-              fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
-              color={theme.palette.primary.charcoal}
-            >
-              {eventHostName || ''}
-            </Typography>
+            <Box>
+              <UserAvatar
+                user={eventHost}
+                imageClassName={avatarStyles.userAvatar}
+                MuiAvatarComponent={<CustomGenericMuiAvatar theme={theme} />}
+              />
+              <Typography
+                fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
+                color={theme.palette.primary.charcoal}
+              >
+                {eventHost?.firstName || ''}
+              </Typography>
+            </Box>
           </Box>
           {status === AuthStatus.Authenticated && isSessionUserEventHost() && (
             <Box>

@@ -7,7 +7,8 @@ export const UserClient = {
 
     if (scopes && scopes.length > 0) {
       endPoint = endPoint.concat('?');
-      appendSearchParams(endPoint, 'scope', scopes);
+
+      endPoint = appendSearchParams(endPoint, 'scope', scopes);
     }
 
     try {
@@ -58,8 +59,9 @@ export const UserClient = {
 };
 
 // Compute the endpoint with the search params. Remember to pre-append the '?'
-function appendSearchParams(endPoint: string, key: string, values: string[]) {
+function appendSearchParams(endPoint: string, key: string, values: string[]): string {
   const searchParams = new URLSearchParams();
   values.forEach((value) => searchParams.append(key, value));
   endPoint = endPoint.concat(`${searchParams.toString()}`);
+  return endPoint;
 }

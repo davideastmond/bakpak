@@ -12,7 +12,18 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   if (!mongoose.Types.ObjectId.isValid(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
-  const userFound: SecureUser = await UserRepository.findById(id).select('-password -admin -email');
+  const { searchParams } = new URL(req.url);
+  const scopes = searchParams.getAll('scope');
+
+  // TODO: scopes needs backend validation
+
+  let userFound: Partial<SecureUser> | undefined = undefined;
+
+  if (scopes.length > 0) {
+    userFound = await UserRepository.findById(id).select(scopes.join(' '));
+  } else {
+    userFound = await UserRepository.findById(id).select('-password -admin -email');
+  }
 
   if (userFound) return NextResponse.json(userFound, { status: 200 });
   return NextResponse.json({ message: `User ${id} not found.` }, { status: 404 });
