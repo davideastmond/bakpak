@@ -1,11 +1,13 @@
 'use client';
 import theme from '@/app/theme';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { Language } from '@/lib/language';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
+  Backdrop,
   Box,
   Button,
   FormControl,
@@ -18,26 +20,30 @@ import {
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { HeaderBarAvatar } from '../avatar/header-bar-avatar/HeaderBarAvatar';
 import { CommonButton } from '../common-button/Common-Button';
 import { Spinner } from '../spinner/Spinner';
 import styles from './styles.module.css';
 
-export default function Header() {
+export function Header() {
   const { session, status } = useAuthContext();
   const [lang, setLang] = useState<Language>(Language.En);
   const [navMenuIsOpen, setnavMenuIsOpen] = useState<boolean>(false);
   const router = useRouter();
+  const { appStatus, appDispatch } = useAppContext();
+  const urlPathname = usePathname();
 
   const navigateToMyProfile = () => {
     setnavMenuIsOpen(false);
     // User is authenticated, so we can navigate to their user portal
     if (status === AuthStatus.Authenticated && session?.user) {
+      appDispatch!({ type: IAppActionType.SET_LOADING });
       router.push(`/users/${session.user._id}`);
     } else {
       // User is not authenticated, so we should navigate to the login page
+      appDispatch!({ type: IAppActionType.SET_LOADING });
       router.push('/auth/signin');
     }
   };
@@ -58,6 +64,9 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div>
+        <Backdrop open={appStatus === 'loading'}>
+          <Spinner />
+        </Backdrop>
         <div className={styles.logoBox}>
           <div
             onClick={() => setnavMenuIsOpen(true)}
@@ -238,27 +247,64 @@ export default function Header() {
           }}
         >
           <Box>
-            <NavButton variant='text' color='inherit' onClick={() => setnavMenuIsOpen(false)}>
+            <NavButton
+              variant='text'
+              color='inherit'
+              onClick={() => {
+                setnavMenuIsOpen(false);
+                appDispatch!({ type: IAppActionType.SET_LOADING });
+              }}
+              disabled={urlPathname === '/'}
+            >
               <Link href='/'>Home</Link>
             </NavButton>
           </Box>
           <Box>
-            <NavButton variant='text' color='inherit' onClick={() => setnavMenuIsOpen(false)}>
-              <Link href='/events/upcoming'>Upcoming Events</Link>
+            <NavButton
+              variant='text'
+              color='inherit'
+              onClick={() => {
+                setnavMenuIsOpen(false);
+                appDispatch!({ type: IAppActionType.SET_LOADING });
+              }}
+              disabled={urlPathname === '/events/upcoming'}
+            >
+              <Link href='/events/upcoming?category=all'>Upcoming Events</Link>
             </NavButton>
           </Box>
           <Box>
-            <NavButton variant='text' color='inherit' onClick={() => setnavMenuIsOpen(false)}>
+            <NavButton
+              variant='text'
+              color='inherit'
+              onClick={() => setnavMenuIsOpen(false)}
+              disabled={urlPathname === '/events/search'}
+            >
               <Link href='/events/search'>Search Events</Link>
             </NavButton>
           </Box>
           <Box>
-            <NavButton variant='text' color='inherit' onClick={() => setnavMenuIsOpen(false)}>
+            <NavButton
+              variant='text'
+              color='inherit'
+              disabled={urlPathname === '/events/create'}
+              onClick={() => {
+                setnavMenuIsOpen(false);
+                appDispatch!({ type: IAppActionType.SET_LOADING });
+              }}
+            >
               <Link href='/events/create'>Create Event</Link>
             </NavButton>
           </Box>
           <Box>
-            <NavButton variant='text' color='inherit' onClick={() => setnavMenuIsOpen(false)}>
+            <NavButton
+              variant='text'
+              color='inherit'
+              disabled={urlPathname === '/about'}
+              onClick={() => {
+                setnavMenuIsOpen(false);
+                appDispatch!({ type: IAppActionType.SET_LOADING });
+              }}
+            >
               <Link href='/about'>About Us</Link>
             </NavButton>
           </Box>
@@ -270,6 +316,12 @@ export default function Header() {
 
 const NavButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
+
+  '&.Mui-disabled': {
+    color: theme.palette.primary.greyDisabled,
+    textDecoration: 'underline',
+  },
+
   [theme.breakpoints.up(610)]: {
     fontSize: '1rem',
   },

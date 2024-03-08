@@ -4,11 +4,12 @@ import styles from './styles.module.css';
 import { EventClient } from '@/app/clients/event/event-client';
 
 import { UserEvent } from '@/models/user-event';
-import { Box, MenuItem, Select } from '@mui/material';
+import { Box, Button, MenuItem, Select } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { EventCard } from '../event/event-card/Event-card';
 
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { Category } from '@/lib/category';
 import {
   generateInitialCheckboxState,
@@ -31,7 +32,7 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
   );
   const [isFilterBoxOpen, setIsFilterBoxOpen] = useState<boolean>(false);
   const router = useRouter();
-
+  const { appDispatch } = useAppContext();
   const handleSearch = (searchInput: string) => {
     const url = `/events/search/${searchInput}`; // Construct the URL
     localStorage.setItem('categoryCheckboxState', JSON.stringify(categoryCheckboxState));
@@ -48,6 +49,10 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
     };
     executeEventSearch();
   }, [categoryCheckboxState, keyword]);
+
+  useEffect(() => {
+    appDispatch!({ type: IAppActionType.SET_IDLE });
+  }, []);
 
   return (
     <section className={styles.section}>
@@ -78,9 +83,9 @@ export function EventSearchSection({ keyword }: EventSearchSectionProps) {
             <MenuItem value='Date'>Date</MenuItem>
           </Select>
         </Box>
-        <p onClick={() => setIsFilterBoxOpen(true)} className={styles.filterBtn}>
-          Filters
-        </p>
+        <Button className={styles.filterBtn} onClick={() => setIsFilterBoxOpen(true)}>
+          Show Filters
+        </Button>
         <Suspense fallback={<Spinner />}>
           <ul className={styles.eventsGrid}>
             {resultEventList.length > 0 ? (

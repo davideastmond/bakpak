@@ -1,3 +1,4 @@
+import { GoogleMapsTimezoneData } from '@/app/integration/google-maps-api/timezone-requestor';
 import dayjs from 'dayjs';
 
 export interface EventUpdateData {
@@ -9,4 +10,5 @@ export interface EventUpdateData {
   geocoderResult: google.maps.places.PlaceResult;
   categories: string[];
   imageFile: File;
+  timezoneResult: GoogleMapsTimezoneData;
 }

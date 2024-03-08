@@ -1,5 +1,6 @@
 import { connectMongoDB } from '@/lib/mongodb';
 import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-update/profile-update-validator';
+import { userScopesValidator } from '@/lib/yup-validators/users/user-scopes-validator';
 import { UserRepository } from '@/schemas/user';
 import { SecureUser } from '@/types/secure-user';
 import mongoose from 'mongoose';
@@ -12,7 +13,23 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   if (!mongoose.Types.ObjectId.isValid(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
-  const userFound: SecureUser = await UserRepository.findById(id).select('-password -admin -email');
+  const { searchParams } = new URL(req.url);
+  const scopes = searchParams.getAll('scope');
+
+  // Validate the scopes
+  try {
+    await userScopesValidator.validate(scopes, { abortEarly: false });
+  } catch (e: any) {
+    return NextResponse.json(e, { status: 400 });
+  }
+
+  let userFound: Partial<SecureUser> | undefined = undefined;
+
+  if (scopes.length > 0) {
+    userFound = await UserRepository.findById(id).select(scopes.join(' '));
+  } else {
+    userFound = await UserRepository.findById(id).select('-password -admin -email');
+  }
 
   if (userFound) return NextResponse.json(userFound, { status: 200 });
   return NextResponse.json({ message: `User ${id} not found.` }, { status: 404 });

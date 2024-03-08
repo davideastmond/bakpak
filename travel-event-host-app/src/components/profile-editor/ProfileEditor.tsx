@@ -1,6 +1,11 @@
 import theme from '@/app/theme';
 
 import { profileFormHeaderSizes } from '@/app/common-styles/form-field-sizes';
+import { extractCoords } from '@/app/integration/google-maps-api/extract-coords';
+import {
+  GoogleMapsTimezoneData,
+  TimezoneRequestor,
+} from '@/app/integration/google-maps-api/timezone-requestor';
 import { ImageType, SpacesImageInteractor } from '@/app/integration/utils/spaces-image-interactor';
 import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-update/profile-update-validator';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
@@ -20,7 +25,10 @@ type EditableProfileFields = 'firstName' | 'lastName' | 'bio' | 'imageUrl' | 'lo
 interface ProfileEditorProps {
   editDisabled?: boolean;
   user?: Partial<SecureUser>;
-  onLocationUpdate?: (location: google.maps.places.PlaceResult | null) => void;
+  onLocationUpdate?: (
+    location: google.maps.places.PlaceResult | null,
+    timezoneData: GoogleMapsTimezoneData,
+  ) => void;
   onProfileUpdate?: (
     formValues: Record<EditableProfileFields, string | null>,
     deleteImageUrl?: boolean,
@@ -61,8 +69,11 @@ export function ProfileEditor({
     onProfileUpdate && onProfileUpdate(formValues as any);
   };
 
-  const handleLocationUpdate = (location: google.maps.places.PlaceResult | null) => {
-    onLocationUpdate && onLocationUpdate(location);
+  const handleLocationUpdate = async (location: google.maps.places.PlaceResult | null) => {
+    const coords = extractCoords(location?.geometry as google.maps.GeocoderGeometry);
+
+    const timezoneData = await TimezoneRequestor.getTimezoneByCoords(coords, Date.now() / 1000);
+    onLocationUpdate && onLocationUpdate(location, timezoneData);
   };
 
   const handleAvatarImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -307,9 +318,7 @@ export function ProfileEditor({
                     {/* Google address field allowing user to change their address */}
                     <AddressAutocomplete
                       componentName='location'
-                      onLocationSelected={(location) => {
-                        handleLocationUpdate(location);
-                      }}
+                      onLocationSelected={handleLocationUpdate}
                     />
                   </Box>
                 </Box>

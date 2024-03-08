@@ -29,6 +29,10 @@ const userSchema = new Schema<User>(
       state: String,
       city: String,
       formattedAddress: String,
+      timezone: {
+        id: String,
+        name: String,
+      },
       coords: { lat: mongoose.Types.Decimal128, lng: mongoose.Types.Decimal128 },
       place_id: String,
     },

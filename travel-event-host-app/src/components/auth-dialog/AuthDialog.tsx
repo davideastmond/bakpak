@@ -3,6 +3,8 @@
 import { AuthClient } from '@/app/clients/auth-client/auth-client';
 import { SignInAPIResponse } from '@/app/clients/auth-client/signin-api-response';
 import { getLocationPostDataFromGeocoderResult } from '@/app/integration/google-maps-api/address-helper';
+import { extractCoords } from '@/app/integration/google-maps-api/extract-coords';
+import { TimezoneRequestor } from '@/app/integration/google-maps-api/timezone-requestor';
 import { signInValidationSchema } from '@/lib/yup-validators/signin/signin-validator';
 import { signUpValidationSchema } from '@/lib/yup-validators/signup/signup-validators';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
@@ -10,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import {
+  Backdrop,
   Box,
   Button,
   Chip,
@@ -29,6 +32,7 @@ import {
   StyledDialogContent,
   StyledDialogTitle,
 } from '../StyledDialog/StyledDialog';
+import { Spinner } from '../spinner/Spinner';
 import { SignInFields } from './sign-in-fields/SignInFields';
 import { SignUpFields } from './sign-up-fields/SignUpFields';
 /**
@@ -45,11 +49,14 @@ export default function AuthDialog(props: AuthDialogProps) {
   const [formValues, setFormValues] = useState<
     Record<string, string | google.maps.GeocoderResult | null>
   >({ firstName: '', lastName: '', email: '', password1: '', password2: '', location: null });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [apiErrors, setApiErrors] = useState<Record<string, string[]> | undefined>(undefined); // Errors returned from the API [
+  const [apiErrors, setApiErrors] = useState<Record<string, string[]> | undefined>(undefined); // Errors returned from the API
+
   const theme = useTheme();
   const searchParams = useSearchParams();
   const router = useRouter();
+
   useEffect(() => {
     const errorMessage = searchParams.get('error');
 
@@ -65,17 +72,19 @@ export default function AuthDialog(props: AuthDialogProps) {
   const handleSubmit = async () => {
     // Validate the signup form
     if (props.authDialogType === 'signup') {
-      console.log('49 signup', formValues);
       try {
         signUpValidationSchema.validateSync(formValues, { abortEarly: false });
       } catch (err: any) {
         const validationErrors = extractValidationErrors(err);
-        console.log('54 validationError', validationErrors);
         setErrors(validationErrors);
         return;
       }
 
       setIsLoading(true);
+      // Get time zone data from google cloud API
+      const coords = extractCoords((formValues.location as google.maps.GeocoderResult).geometry);
+
+      const timezoneData = await TimezoneRequestor.getTimezoneByCoords(coords, Date.now() / 1000);
 
       // Try to register the user. Google location data needs to be adapted.
       try {
@@ -89,6 +98,10 @@ export default function AuthDialog(props: AuthDialogProps) {
             ...getLocationPostDataFromGeocoderResult(
               formValues.location as google.maps.GeocoderResult,
             ),
+            timezone: {
+              id: timezoneData.timeZoneId!,
+              name: timezoneData.timeZoneName!,
+            },
           },
         });
         console.info('Registration successful');
@@ -151,6 +164,9 @@ export default function AuthDialog(props: AuthDialogProps) {
 
   return (
     <StyledDialog open={props.open}>
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <>
         <Box display='flex' justifyContent={'right'}>
           <IconButton onClick={() => router.back()}>

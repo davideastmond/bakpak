@@ -1,6 +1,10 @@
 import { EventClient } from '@/app/clients/event/event-client';
 import { geocoderResultValidationSchema } from '@/app/events/create/validators/geocoder-result-validation-schema';
-import { getLocationPostDataFromGeocoderResult } from '@/app/integration/google-maps-api/address-helper';
+import { timezoneValidationSchema } from '@/app/events/create/validators/google-timezone-validation-schema';
+import {
+  getLocationPostDataFromGeocoderResult,
+  getTimezoneDataFromTimezoneResult,
+} from '@/app/integration/google-maps-api/address-helper';
 import { ImageType, SpacesImageInteractor } from '@/app/integration/utils/spaces-image-interactor';
 import theme from '@/app/theme';
 import { useAuthContext } from '@/lib/auth-context';
@@ -50,6 +54,7 @@ export function EventEditor({
       geocoderResult,
       categories,
       imageFile,
+      timezoneResult,
     } = data;
     setIsLoading(true);
     let location = null; // This will hold the formatted location data to send to API if it's available
@@ -57,9 +62,11 @@ export function EventEditor({
     if (geocoderResult !== null) {
       try {
         geocoderResultValidationSchema.validateSync({ geocoderResult }, { abortEarly: false });
-        location = getLocationPostDataFromGeocoderResult(
-          geocoderResult as google.maps.GeocoderResult,
-        );
+        timezoneValidationSchema.validateSync({ timezoneResult }, { abortEarly: false });
+        location = {
+          ...getLocationPostDataFromGeocoderResult(geocoderResult as google.maps.GeocoderResult),
+          timezone: getTimezoneDataFromTimezoneResult(timezoneResult),
+        };
       } catch (e: any) {
         setErrors({ ...extractValidationErrors(e), apiError: ['There were errors.'] });
         setIsLoading(false);

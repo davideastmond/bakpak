@@ -16,6 +16,7 @@ interface UserAvatarProps {
   MuiAvatarComponent: JSX.Element;
   imageClassName?: any;
   nameStyles?: any;
+  altText?: string;
 }
 
 export default function UserAvatar({
@@ -25,6 +26,7 @@ export default function UserAvatar({
   MuiAvatarComponent,
   imageClassName,
   nameStyles,
+  altText,
 }: UserAvatarProps) {
   const handleAvatarClicked = () => {
     onAvatarClicked && onAvatarClicked();
@@ -51,13 +53,14 @@ export default function UserAvatar({
             borderColor={theme.palette.primary.thirdColorIceLight}
             border={'2px solid'}
           >
-            {loadAvatarImage(
+            {loadAvatarImage({
               isErrorImage,
               setIsErrorImage,
               MuiAvatarComponent,
               imageClassName,
               user,
-            )}
+              altText,
+            })}
           </Box>
         </Box>
         {showName && (
@@ -77,13 +80,21 @@ export default function UserAvatar({
   );
 }
 
-function loadAvatarImage(
-  isErrorImage: boolean,
-  setIsErrorImage: (isError: boolean) => void,
-  MuiAvatarComponent: any,
-  imageClassName?: any,
-  user?: Partial<SecureUser>,
-) {
+function loadAvatarImage({
+  isErrorImage,
+  setIsErrorImage,
+  MuiAvatarComponent,
+  imageClassName,
+  user,
+  altText,
+}: {
+  isErrorImage: boolean;
+  setIsErrorImage: (isError: boolean) => void;
+  MuiAvatarComponent: any;
+  imageClassName?: any;
+  user?: Partial<SecureUser>;
+  altText?: string;
+}) {
   if (user?.imageUrl === undefined || user.imageUrl === '') {
     return MuiAvatarComponent;
   }
@@ -98,7 +109,7 @@ function loadAvatarImage(
       src={user.imageUrl}
       fill
       objectFit='cover'
-      alt={user.firstName || 'Participant'}
+      alt={altText || user.firstName || 'Participant'}
       onError={() => setIsErrorImage(true)}
       className={imageClassName}
     />

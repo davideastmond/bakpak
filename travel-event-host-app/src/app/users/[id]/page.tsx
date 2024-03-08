@@ -2,17 +2,19 @@
 import { EventClient } from '@/app/clients/event/event-client';
 import { UserClient } from '@/app/clients/user/user-client';
 import { getLocationPostDataFromGeocoderResult } from '@/app/integration/google-maps-api/address-helper';
+import { GoogleMapsTimezoneData } from '@/app/integration/google-maps-api/timezone-requestor';
 import theme from '@/app/theme';
 import { EventsSection } from '@/components/events-section/Events-section';
 import { ProfileEditor } from '@/components/profile-editor/ProfileEditor';
 import { Spinner } from '@/components/spinner/Spinner';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
-import { LocationData } from '@/models/location';
 import { UserEvent } from '@/models/user-event';
 import { EventTimeLine } from '@/types/event-timeline';
 import { SecureUser } from '@/types/secure-user';
-import { Alert, Box } from '@mui/material';
+import { Alert, Backdrop, Box } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface UserPortalPageProps {
@@ -35,12 +37,15 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
   const [hostedEventsPageNumber, setHostedEventsPageNumber] = useState<number>(1);
   const [upcomingEventsPageNumber, setUpcomingEventsPageNumber] = useState<number>(1);
   const [pastEventsPageNumber, setPastEventsPageNumber] = useState<number>(1);
+  const router = useRouter();
+  const { appDispatch } = useAppContext();
 
   useEffect(() => {
     fetchUser();
     fetchUserUpcomingEvents();
     fetchUserHostedEvents();
     fetchUserPastEvents();
+    appDispatch!({ type: IAppActionType.SET_IDLE });
   }, []);
 
   useEffect(() => {
@@ -134,13 +139,24 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
     }
   };
 
-  const handleUserLocationUpdate = async (location: google.maps.places.PlaceResult | null) => {
+  const handleUserLocationUpdate = async (
+    location: google.maps.places.PlaceResult | null,
+    timezoneData: GoogleMapsTimezoneData,
+  ) => {
     if (!location) return;
     if (status !== AuthStatus.Authenticated) return;
 
-    const locationData: LocationData = getLocationPostDataFromGeocoderResult(
+    // TODO: timezone
+    let locationData: any = getLocationPostDataFromGeocoderResult(
       location as google.maps.GeocoderResult,
     );
+    locationData = {
+      ...locationData,
+      timezone: {
+        id: timezoneData.timeZoneId,
+        name: timezoneData.timeZoneName,
+      },
+    };
     try {
       await UserClient.patchUserLocationById(session?.user?._id!, locationData);
       // Refresh the user
@@ -151,8 +167,15 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
     }
   };
 
+  const handleEventCardClicked = (eventId: string) => {
+    router.push(`/events/${eventId}`);
+  };
+
   return (
     <Box>
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       {error && <Alert severity='error'>{error}</Alert>}
       <Box
         className={'userProfileHeaderSection'}
@@ -198,6 +221,7 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
                 setHostedEventsPageNumber(hostedEventsPageNumber + 1)
               }
               isLoading={isLoading}
+              onEventCardClicked={handleEventCardClicked}
             />
           </Box>
         )}
@@ -210,6 +234,7 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
                 setUpcomingEventsPageNumber(upcomingEventsPageNumber + 1)
               }
               isLoading={isLoading}
+              onEventCardClicked={handleEventCardClicked}
             />
           </Box>
         )}
@@ -222,6 +247,7 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
                 setPastEventsPageNumber(pastEventsPageNumber + 1)
               }
               isLoading={isLoading}
+              onEventCardClicked={handleEventCardClicked}
             />
           </Box>
         )}

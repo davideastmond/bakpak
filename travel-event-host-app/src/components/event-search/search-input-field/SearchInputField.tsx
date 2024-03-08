@@ -24,7 +24,7 @@ export function SearchInputField({
       }}
       value={searchInput}
       onChange={(e) => setSearchInput(e.target.value as string)}
-      sx={{ fontSize: '2em', flexGrow: 1 }}
+      sx={{ fontSize: '2em', flexGrow: 1, '& .MuiInputBase-root': { backgroundColor: 'white' } }}
       InputProps={{
         endAdornment: (
           <div onClick={() => handleSearch(searchInput)} className={styles.searchBtn}>

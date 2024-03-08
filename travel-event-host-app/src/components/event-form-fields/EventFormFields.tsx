@@ -9,6 +9,11 @@ import { Category } from '@/lib/category';
 import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
 
+import { extractCoords } from '@/app/integration/google-maps-api/extract-coords';
+import {
+  GoogleMapsTimezoneData,
+  TimezoneRequestor,
+} from '@/app/integration/google-maps-api/timezone-requestor';
 import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Box, Button, Divider, Typography } from '@mui/material';
@@ -51,13 +56,17 @@ export function EventFormFields({
   const [formattedAddress, setFormattedAddress] = useState<string | null>(
     eventContext?.location.formattedAddress || '',
   );
+
   // Checkbox state needs to be rendered based on the current categories in the event context
   const [categoryCheckboxesState, setCategoryCheckboxesState] = useState<{
     [key in string]: boolean;
   }>(generateInitialCheckboxStateFromArray(eventContext?.categories || [], Category));
 
   const [formValues, setFormValues] = useState<
-    Record<string, string | dayjs.Dayjs | google.maps.places.PlaceResult | null | File>
+    Record<
+      string,
+      string | dayjs.Dayjs | google.maps.places.PlaceResult | null | File | GoogleMapsTimezoneData
+    >
   >({
     title: eventContext?.title || '',
     description: eventContext?.description || '',
@@ -66,6 +75,7 @@ export function EventFormFields({
     imageUrl: eventContext?.imageUrl || null,
     imageFile: null,
     geocoderResult: null,
+    timezoneResult: null,
   });
 
   const [, setGoogleMap] = useState<google.maps.Map | null>(null);
@@ -86,14 +96,15 @@ export function EventFormFields({
 
       sampleMap = new Map(document.getElementById('googleMapEdit') as HTMLElement, {
         center: {
-          lat: CoordsHelper.toFloat(eventContext?.location.coords.lat as any),
-          lng: CoordsHelper.toFloat(eventContext?.location.coords.lng as any),
+          lat: CoordsHelper.toFloat((eventContext?.location?.coords?.lat as any) || 0),
+          lng: CoordsHelper.toFloat((eventContext?.location?.coords?.lng as any) || 0),
         },
         zoom: 15,
         mapId: 'DEMO_MAP',
       });
 
       setGoogleMap(sampleMap);
+
       let mapMarkerElement: google.maps.marker.AdvancedMarkerElement | null =
         new AdvancedMarkerElement({
           position: {
@@ -133,11 +144,40 @@ export function EventFormFields({
       geocoderResult: formValues.geocoderResult as google.maps.places.PlaceResult,
       categories: getCheckedElements(categoryCheckboxesState),
       imageFile: formValues.imageFile as File,
+      timezoneResult: formValues.timezoneResult as GoogleMapsTimezoneData,
     };
 
     onSubmission && onSubmission(updateData);
   };
 
+  const handleGoogleMapsLocationSelected = async (location: google.maps.places.PlaceResult) => {
+    if (location) {
+      const coords = extractCoords(location.geometry as google.maps.GeocoderGeometry);
+
+      const timezoneData = await TimezoneRequestor.getTimezoneByCoords(coords, Date.now() / 1000); // In seconds
+      setFormValues((prev) => ({
+        ...prev,
+        geocoderResult: location as google.maps.places.PlaceResult,
+        timezoneResult: timezoneData,
+      }));
+      setFormattedAddress(location?.formatted_address as string);
+      // Center the map on a new location
+      setGoogleMap((prev) => {
+        prev?.setCenter(location?.geometry?.location!);
+
+        new google.maps.marker.AdvancedMarkerElement({
+          position: location?.geometry?.location!,
+          map: prev,
+        });
+
+        return prev;
+      });
+      setMapMarker((prev) => {
+        (prev as any).setMap(null);
+        return prev;
+      });
+    }
+  };
   if (isLoading) return <Spinner />;
 
   return (
@@ -210,6 +250,66 @@ export function EventFormFields({
         />
         <ErrorComponent fieldName='description' errors={errors!} />
       </StyledFormFieldSection>
+      <Divider sx={{ borderColor: theme.palette.primary.thirdColorIceLight }} />
+      <StyledFormFieldSection sx={{ mt: 2, mb: 2 }}>
+        <Box>
+          <Typography
+            color={theme.palette.primary.thirdColorIceLight}
+            sx={{
+              fontSize: profileFormHeaderSizes,
+              fontWeight: 'bold',
+              mb: 1,
+            }}
+          >
+            Where is this event taking place?
+          </Typography>
+          <Typography
+            color={theme.palette.primary.thirdColorIceLight}
+            sx={{
+              fontSize: textInputFieldFontSizes,
+              mb: 1,
+            }}
+          >
+            {formattedAddress}
+          </Typography>
+          {/* Google map here. I can be conditionally rendered */}
+          <Box mt={2} mb={2}>
+            <Box id='googleMapEdit' width={'100%'} height={200}></Box>
+          </Box>
+          <AddressAutocomplete
+            componentName={'geocoderResult'}
+            placeholder='Update location...'
+            onLocationSelected={(location) => {
+              handleGoogleMapsLocationSelected(location);
+            }}
+          />
+          <ErrorComponent fieldName='geocoderResult' errors={errors!} />
+        </Box>
+      </StyledFormFieldSection>
+      <StyledFormFieldSection>
+        {/* Timezone section here is readonly */}
+        <Typography
+          color={theme.palette.primary.thirdColorIceLight}
+          sx={{
+            fontSize: profileFormHeaderSizes,
+            alignContent: 'center',
+            fontWeight: 'bold',
+          }}
+        >
+          Time zone
+        </Typography>
+        <Typography
+          color={theme.palette.primary.thirdColorIceLight}
+          sx={{
+            fontSize: textInputFieldFontSizes,
+            mb: 1,
+          }}
+        >
+          {(formValues.timezoneResult as GoogleMapsTimezoneData)?.timeZoneName ||
+            'Unknown timezone'}
+        </Typography>
+      </StyledFormFieldSection>
+      <Divider sx={{ borderColor: theme.palette.primary.thirdColorIceLight, mb: 3 }} />
       <StyledFormFieldSection>
         <Box
           display='flex'
@@ -281,64 +381,6 @@ export function EventFormFields({
           />
         </Box>
       </StyledFormFieldSection>
-      <Divider sx={{ borderColor: theme.palette.primary.thirdColorIceLight }} />
-      <StyledFormFieldSection sx={{ mt: 2, mb: 2 }}>
-        <Box>
-          <Typography
-            color={theme.palette.primary.thirdColorIceLight}
-            sx={{
-              fontSize: profileFormHeaderSizes,
-              fontWeight: 'bold',
-              mb: 1,
-            }}
-          >
-            Where is this event taking place?
-          </Typography>
-          <Typography
-            color={theme.palette.primary.thirdColorIceLight}
-            sx={{
-              fontSize: textInputFieldFontSizes,
-              mb: 1,
-            }}
-          >
-            {formattedAddress}
-          </Typography>
-          {/* Google map here. I can be conditionally rendered */}
-          <Box mt={2} mb={2}>
-            <Box id='googleMapEdit' width={'100%'} height={200}></Box>
-          </Box>
-          <AddressAutocomplete
-            componentName={'geocoderResult'}
-            placeholder='Update location...'
-            onLocationSelected={(location) => {
-              if (location) {
-                setFormValues((prev) => ({
-                  ...prev,
-                  geocoderResult: location as google.maps.places.PlaceResult,
-                }));
-                setFormattedAddress(location?.formatted_address as string);
-                // Center the map on a new location
-                setGoogleMap((prev) => {
-                  prev?.setCenter(location?.geometry?.location!);
-
-                  new google.maps.marker.AdvancedMarkerElement({
-                    position: location?.geometry?.location!,
-                    map: prev,
-                  });
-
-                  return prev;
-                });
-                setMapMarker((prev) => {
-                  (prev as any).setMap(null);
-                  return prev;
-                });
-              }
-            }}
-          />
-          <ErrorComponent fieldName='geocoderResult' errors={errors!} />
-        </Box>
-      </StyledFormFieldSection>
-      <Divider sx={{ borderColor: theme.palette.primary.thirdColorIceLight }} />
       <StyledFormFieldSection mt={2}>
         {imagePreview && (
           <Box id='event-image-container'>

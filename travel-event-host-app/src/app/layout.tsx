@@ -3,9 +3,10 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import type { Metadata } from 'next';
 import { Roboto_Flex } from 'next/font/google';
 
-import Header from '@/components/header/Header';
+import { Header } from '@/components/header/Header';
 
 import { Footer } from '@/components/footer/Footer';
+import { AppProvider } from '@/lib/app-context';
 import { AuthenticationSessionProvider } from '@/lib/auth-context';
 import { NextAuthProvider } from '@/providers/nextAuthProvider';
 import './globals.css';
@@ -27,9 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthenticationSessionProvider>
             <AppRouterCacheProvider>
               <MuiThemeProvider>
-                <Header />
-                {children}
-                <Footer />
+                <AppProvider>
+                  <Header />
+                  {children}
+                  <Footer />
+                </AppProvider>
               </MuiThemeProvider>
             </AppRouterCacheProvider>
           </AuthenticationSessionProvider>

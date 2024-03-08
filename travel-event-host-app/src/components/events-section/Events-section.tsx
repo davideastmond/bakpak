@@ -17,6 +17,7 @@ interface EventsSectionProps {
   hostedEvents: UserEvent[];
   onLoadMoreEventsButtonClicked: () => void;
   isLoading?: boolean;
+  onEventCardClicked: (eventId: string) => void;
 }
 
 export function EventsSection({
@@ -24,6 +25,7 @@ export function EventsSection({
   hostedEvents,
   onLoadMoreEventsButtonClicked,
   isLoading,
+  onEventCardClicked,
 }: EventsSectionProps) {
   const theme = useTheme();
   const router = useRouter();
@@ -32,9 +34,7 @@ export function EventsSection({
   };
 
   const handleEventCardClicked = (eventId: string) => {
-    // This should navigate to the event details page
-    if (!eventId) return;
-    router.push(`/events/${eventId}`);
+    onEventCardClicked(eventId);
   };
 
   return (
