@@ -11,6 +11,7 @@ import { ConfirmationDialog } from '@/components/confirmation-dialog/Confirmatio
 import { EventEditor } from '@/components/event-editor/EventEditor';
 import { Spinner } from '@/components/spinner/Spinner';
 import UserListContainer from '@/components/user-list-container/UserListContainer';
+import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { CategoryDict } from '@/lib/category-dictionary';
@@ -25,8 +26,8 @@ import { Alert, Backdrop, Box, Chip, Snackbar, Typography, styled } from '@mui/m
 import dayjs from 'dayjs';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction, Suspense, useEffect, useState } from 'react';
-import avatarStyles from '../../../app/common-styles/avatar-styles.module.css';
 import { isEventInPast } from '../helpers/event-utils';
 import styles from './styles.module.css';
 interface EventDetailsPageProps {
@@ -66,6 +67,10 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
   const [eventEditorModalOpen, setEventEditModalOpen] = useState<boolean>(false);
   const [eventUpdateSnackbarOpen, setEventUpdateSnackbarOpen] = useState<boolean>(false);
   const [googleMap, setGoogleMap] = useState<google.maps.Map | undefined>(undefined);
+
+  const { appDispatch } = useAppContext();
+  const router = useRouter();
+
   useEffect(() => {
     fetchEvent();
   }, []);
@@ -192,7 +197,9 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
 
   return (
     <Box>
-      <Backdrop open={isLoading} />
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <Suspense fallback={<Spinner />}>
         <StyledContentContainer
           p={'10%'}
@@ -222,17 +229,33 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
               Hosted by
             </Typography>
             <Box>
-              <UserAvatar
-                user={eventHost}
-                imageClassName={avatarStyles.userAvatar}
-                MuiAvatarComponent={<CustomGenericMuiAvatar theme={theme} />}
-              />
-              <Typography
-                fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
-                color={theme.palette.primary.charcoal}
+              <Box
+                display='flex'
+                justifyContent={'center'}
+                sx={{
+                  [theme.breakpoints.up('md')]: {
+                    justifyContent: 'flex-start',
+                  },
+                }}
               >
-                {eventHost?.firstName || ''}
-              </Typography>
+                <UserAvatar
+                  onAvatarClicked={() => {
+                    appDispatch!({ type: IAppActionType.SET_LOADING });
+                    router.push(`/users/${eventHost?._id}`);
+                  }}
+                  user={eventHost}
+                  imageClassName={styles.eventHostImage}
+                  MuiAvatarComponent={<CustomGenericMuiAvatar theme={theme} />}
+                />
+              </Box>
+              <Box>
+                <Typography
+                  fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
+                  color={theme.palette.primary.charcoal}
+                >
+                  {`${eventHost?.firstName} ${eventHost?.lastName}`}
+                </Typography>
+              </Box>
             </Box>
           </Box>
           {status === AuthStatus.Authenticated && isSessionUserEventHost() && (

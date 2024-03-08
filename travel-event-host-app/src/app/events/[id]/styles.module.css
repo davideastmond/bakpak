@@ -4,6 +4,12 @@
   height: 135px !important;
 }
 
+.eventHostImage {
+  position: relative !important;
+  width: 50px !important;
+  height: 50px !important;
+}
+
 @media only screen and (min-width: 600px) {
   .userEventImage {
     width: 400px !important;
