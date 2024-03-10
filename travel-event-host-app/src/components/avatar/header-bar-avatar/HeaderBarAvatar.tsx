@@ -1,4 +1,5 @@
 import { textInputFieldFontSizes } from '@/app/common-styles/form-field-sizes';
+import { HeaderIconTextSize } from '@/app/common-styles/text-sizes';
 import theme from '@/app/theme';
 import { useAuthContext } from '@/lib/auth-context';
 import {
@@ -88,7 +89,7 @@ export function HeaderBarAvatar({
               },
             }}
           >
-            <Typography style={{ padding: 0, fontSize: '0.9rem' }}>{userName}</Typography>
+            <Typography style={{ padding: 0, fontSize: HeaderIconTextSize }}>{userName}</Typography>
           </Box>
         </ButtonBase>
       </Box>

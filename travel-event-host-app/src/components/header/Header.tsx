@@ -1,9 +1,11 @@
 'use client';
+import { HeaderIconTextSize } from '@/app/common-styles/text-sizes';
 import theme from '@/app/theme';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
 import { Language } from '@/lib/language';
+import MessageIcon from '@mui/icons-material/ChatBubbleOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -182,6 +184,24 @@ export function Header() {
           </Box>
           {status === AuthStatus.Authenticated ? (
             <>
+              <Box display='flex' flexDirection={'column'}>
+                <Box alignSelf={'center'}>
+                  <IconButton>
+                    <Link href='/messages'>
+                      <MessageIcon sx={{ color: theme.palette.primary.thirdColorIceLight }} />
+                    </Link>
+                  </IconButton>
+                </Box>
+                <Box
+                  sx={{
+                    [theme.breakpoints.down(431)]: {
+                      display: 'none',
+                    },
+                  }}
+                >
+                  <Typography fontSize={HeaderIconTextSize}>Messages</Typography>
+                </Box>
+              </Box>
               <div className={styles.avatarBox}>
                 {/* Handle signout/sign out here */}
                 <HeaderBarAvatar
