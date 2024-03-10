@@ -18,6 +18,7 @@ enum ColorPalette {
   NavyBlue = '#1D275F',
   GreenConfirmation = '#64aa76',
   BurntOrangeCancelError = '#aa6464',
+  SexyHotPink = '#e32359',
 }
 
 // Module augmentation to make sure our custom colors types are available for MaterialUI components
@@ -36,6 +37,7 @@ declare module '@mui/material/styles' {
     navyBlue: string;
     greenConfirmation: string;
     burntOrangeCancelError: string;
+    sexyHotPink: string;
   }
 
   interface SimplePaletteColorOptions extends PaletteColor {}
@@ -59,6 +61,7 @@ const theme = createTheme({
       navyBlue: ColorPalette.NavyBlue,
       greenConfirmation: ColorPalette.GreenConfirmation,
       burntOrangeCancelError: ColorPalette.BurntOrangeCancelError,
+      sexyHotPink: ColorPalette.SexyHotPink,
     },
   },
 });
