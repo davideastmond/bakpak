@@ -1,9 +1,9 @@
 import { connectMongoDB } from '@/lib/mongodb';
+import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { UserRepository } from '@/schemas/user';
 import { EventRepository } from '@/schemas/user-event';
 import { EventTimeLine } from '@/types/event-timeline';
 
-import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
 // This route will return all the events for a user.
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   const timeline: string = searchParams.get('timeline') || EventTimeLine.All;
 
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!isValidMongoId(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
   await connectMongoDB();

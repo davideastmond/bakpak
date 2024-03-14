@@ -1,16 +1,16 @@
 import { connectMongoDB } from '@/lib/mongodb';
+import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-update/profile-update-validator';
 import { userScopesValidator } from '@/lib/yup-validators/users/user-scopes-validator';
 import { UserRepository } from '@/schemas/user';
 import { SecureUser } from '@/types/secure-user';
-import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   await connectMongoDB();
 
   const { id } = params;
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!isValidMongoId(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
   const { searchParams } = new URL(req.url);
@@ -38,7 +38,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const { id } = params;
 
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!isValidMongoId(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
   const requestBody = await req.json();

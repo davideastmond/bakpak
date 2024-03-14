@@ -1,7 +1,7 @@
 import { userIdValidator } from '@/app/api/endpoint-validation/schemas/user-id-validator.schema';
 import { connectMongoDB } from '@/lib/mongodb';
+import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { EventRepository } from '@/schemas/user-event';
-import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   const { id } = params;
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!isValidMongoId(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
   await connectMongoDB();
