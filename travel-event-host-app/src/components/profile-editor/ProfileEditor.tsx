@@ -11,7 +11,7 @@ import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-upda
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
 import { SecureUser } from '@/types/secure-user';
 import { Box, Button, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import avatarStyles from '../../app/common-styles/avatar-styles.module.css';
 import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { AddressAutocomplete } from '../address-autocomplete/AddressAutocomplete';
@@ -19,6 +19,7 @@ import { CustomGenericMuiAvatar } from '../avatar/custom-generic-user-avatar/Cus
 import UserAvatar from '../avatar/user-avatar/UserAvatar';
 import { CustomTextField, StyledFormFieldSection } from '../custom-fields/CustomFields';
 import { ImagePicker } from '../image-picker/ImagePicker';
+import { Spinner } from '../spinner/Spinner';
 
 type EditableProfileFields = 'firstName' | 'lastName' | 'bio' | 'imageUrl' | 'location';
 
@@ -203,15 +204,17 @@ export function ProfileEditor({
           >
             <StyledFormFieldSection>
               {editDisabled ? (
-                <Typography
-                  sx={{
-                    fontSize: profilNotEditableContentSizes,
-                    color: theme.palette.primary.thirdColorIceLight,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {user?.firstName}
-                </Typography>
+                <Suspense fallback={<Spinner />}>
+                  <Typography
+                    sx={{
+                      fontSize: profilNotEditableContentSizes,
+                      color: theme.palette.primary.thirdColorIceLight,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {user?.firstName}
+                  </Typography>
+                </Suspense>
               ) : (
                 <Box>
                   <Box>
@@ -247,15 +250,17 @@ export function ProfileEditor({
             </StyledFormFieldSection>
             <StyledFormFieldSection>
               {editDisabled ? (
-                <Typography
-                  sx={{
-                    fontSize: profilNotEditableContentSizes,
-                    color: theme.palette.primary.thirdColorIceLight,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {user?.lastName}
-                </Typography>
+                <Suspense fallback={<Spinner />}>
+                  <Typography
+                    sx={{
+                      fontSize: profilNotEditableContentSizes,
+                      color: theme.palette.primary.thirdColorIceLight,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {user?.lastName}
+                  </Typography>
+                </Suspense>
               ) : (
                 <Box>
                   <Box>
