@@ -8,6 +8,6 @@ export const EventParticipantSchema = new Schema<EventParticipant>({
   },
   timeStamp: {
     type: Date,
-    default: Date.now,
+    default: Date.now(),
   },
 });

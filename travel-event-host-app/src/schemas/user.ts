@@ -1,5 +1,6 @@
 import { User } from '@/models/user';
 import mongoose, { Schema } from 'mongoose';
+import { blockedUserSchema } from './messaging/blocked-user.schema';
 
 const userSchema = new Schema<User>(
   {
@@ -41,6 +42,8 @@ const userSchema = new Schema<User>(
       type: Boolean,
       default: false,
     },
+
+    blockedUsers: [blockedUserSchema],
   },
   { timestamps: true },
 );

@@ -19,6 +19,8 @@ enum ColorPalette {
   GreenConfirmation = '#64aa76',
   BurntOrangeCancelError = '#aa6464',
   SexyHotPink = '#e32359',
+  AliceBlue = '#F0FFFF',
+  WhiteSmoke = '#F0F8FF',
 }
 
 // Module augmentation to make sure our custom colors types are available for MaterialUI components
@@ -38,6 +40,8 @@ declare module '@mui/material/styles' {
     greenConfirmation: string;
     burntOrangeCancelError: string;
     sexyHotPink: string;
+    whiteSmoke: string;
+    aliceBlue: string;
   }
 
   interface SimplePaletteColorOptions extends PaletteColor {}
@@ -62,6 +66,8 @@ const theme = createTheme({
       greenConfirmation: ColorPalette.GreenConfirmation,
       burntOrangeCancelError: ColorPalette.BurntOrangeCancelError,
       sexyHotPink: ColorPalette.SexyHotPink,
+      whiteSmoke: ColorPalette.WhiteSmoke,
+      aliceBlue: ColorPalette.AliceBlue,
     },
   },
 });
