@@ -5,3 +5,7 @@ export const createNewMessageValidator = object({
   recipients: array().of(string()).required(),
   message: string().required(),
 });
+
+export const postMessageToThreadValidator = object({
+  content: string().required(),
+});

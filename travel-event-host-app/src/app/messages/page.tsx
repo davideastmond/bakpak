@@ -3,6 +3,9 @@ import { CustomTextField } from '@/components/custom-fields/CustomFields';
 
 import {
   AvatarMessageHeaderCard,
+  MessageBlurb,
+  MessageBlurbContainer,
+  MessageThreadCard,
   NewConversationHeader,
 } from '@/components/messaging/message-thread-card/MessageThreadCard';
 import { Spinner } from '@/components/spinner/Spinner';
@@ -15,7 +18,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, ButtonBase, Divider, IconButton, Typography } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import { Suspense, useEffect, useState } from 'react';
 import { MessageClient } from '../clients/message/message-client';
 import { UserClient } from '../clients/user/user-client';
@@ -25,7 +29,7 @@ export default function MessagePage() {
   //const [user, setUser] = useState<Partial<SecureUser> | undefined>(undefined);
   const [newMessageRecipients, setNewMessageRecipients] = useState<SecureUser[]>([]);
 
-  const [threadContexts, setThredContexts] = useState<MessageThread[]>([]);
+  const [threadContexts, setThreadContexts] = useState<MessageThread[]>([]);
 
   const [currentThreadContext, setCurrentThreadContext] = useState<string | null | undefined>(null); // This will hold the current thread ID. Should it be
   const [isNewMessage, setIsNewMessage] = useState<boolean>(false);
@@ -34,36 +38,52 @@ export default function MessagePage() {
   const { session } = useAuthContext();
 
   const searchParams = useSearchParams();
-
+  const router = useRouter();
   useEffect(() => {
-    const targetUserId = searchParams.get('target');
-    const isNewMessage = searchParams.get('newMessage');
+    const initializeContexts = async () => {
+      const targetUserId = searchParams.get('target');
+      const newMessageParam = searchParams.get('newMessage');
+      const fetchedThreadContexts = await fetchThreadContexts();
 
-    // If it's a new message, we fetch the target user by Id.
-    if (isNewMessage && isValidMongoId(targetUserId as string)) {
-      setIsNewMessage(true);
-      fetchNewMessageUser(targetUserId as string);
-    }
-  }, []);
+      // Even though it could be a new message, there could be a thread already existing for the user.
+      // If one does exist, we should set the current thread context to that and switch the isMessage flag to false.
+      const existingThread = fetchedThreadContexts.find((thread) => {
+        return (
+          thread.originator === session?.user._id &&
+          thread.recipients.includes(targetUserId as string)
+        );
+      });
 
-  useEffect(() => {
-    //fetchThreadContexts();
-  }, [threadContexts]);
+      if (newMessageParam && !isNewMessage && isValidMongoId(targetUserId as string)) {
+        if (!existingThread) {
+          setIsNewMessage(true);
+          fetchNewMessageUser(targetUserId as string);
+        } else {
+          router && router.replace('/messages');
+        }
+        return;
+      }
+
+      // If
+    };
+
+    initializeContexts();
+  }, [session]);
 
   const fetchNewMessageUser = async (id: string) => {
     const targetUser = await UserClient.getUserById(id);
-    setNewMessageRecipients([...newMessageRecipients, targetUser as SecureUser]);
+    setNewMessageRecipients([targetUser as SecureUser]);
   };
 
-  const fetchThreadContexts = async () => {
+  const fetchThreadContexts = async (): Promise<MessageThread[]> => {
     // Fetch all the threads that the user is part of.
     // This will be used to render the message threads.
     // We will also need to fetch the last message in each thread.
     // We will also need to fetch the user's avatar and name.
 
     const threadContexts = await MessageClient.getAllThreadContexts();
-    setThredContexts(threadContexts);
-    console.log('64', threadContexts);
+    setThreadContexts(threadContexts);
+    return threadContexts;
   };
 
   const handleSendMessage = async () => {
@@ -71,14 +91,27 @@ export default function MessagePage() {
     // Grab context of the thread if available.
     // If it's a new message, we need to create a new thread.
     if (isNewMessage) {
-      const newThreadContextId = await MessageClient.createThreadAndPostMessage({
+      await MessageClient.createThreadAndPostMessage({
         initiator: session?.user._id as string,
         recipients: newMessageRecipients.map((recipient) => recipient._id),
         message: chatMessage,
       });
-      console.log(newThreadContextId);
+      // Refresh the thread contexts
+      await fetchThreadContexts();
+      setChatMessage('');
+      return;
     }
+
+    if (!currentThreadContext) return;
+
+    const refreshedThread = await MessageClient.postMessageToThread({
+      threadId: currentThreadContext,
+      content: chatMessage,
+    });
+    setChatMessage('');
+    await fetchThreadContexts();
   };
+
   return (
     <Box
       padding='20px'
@@ -177,6 +210,15 @@ export default function MessagePage() {
               <Suspense fallback={<Spinner />}>
                 {/* Message thread needs to be rendered */}
                 {/* <MessageThreadCard user={user!} /> */}
+
+                {threadContexts.map((threadContext) => (
+                  <MessageThreadCard
+                    key={threadContext._id}
+                    baseUser={session?.user}
+                    threadContext={threadContext}
+                    onMessageThreadCardClicked={(threadId) => setCurrentThreadContext(threadId)}
+                  />
+                ))}
               </Suspense>
             </Box>
             <Box bgcolor={'white'} p={2}>
@@ -206,8 +248,6 @@ export default function MessagePage() {
             </Box>
             <Box id='right-container-header'>
               {/* This will have the chat avatar icon with location for new messages */}
-              {/*  */}
-              {/* <AvatarMessageHeaderCard user={user!} /> */}
               {newMessageRecipients.map((recipient) => (
                 <AvatarMessageHeaderCard
                   key={recipient._id}
@@ -235,20 +275,16 @@ export default function MessagePage() {
                 minHeight={'58vh'}
               >
                 {/* This is the space for the messages */}
-                {/* <MessageBlurbContainer position='start'>
-                  <MessageBlurb
-                    user={user!}
-                    body='Beginning Here! There is some text that needs to be display'
-                    position='start'
+                {currentThreadContext && session && (
+                  <MessageRenderer
+                    threadContext={
+                      threadContexts.find(
+                        (thread) => thread._id === currentThreadContext,
+                      ) as MessageThread
+                    }
+                    userId={session.user._id}
                   />
-                </MessageBlurbContainer> */}
-                {/* <MessageBlurbContainer position='end'>
-                  <MessageBlurb
-                    user={user!}
-                    body='Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-                    position='end'
-                  />
-                </MessageBlurbContainer> */}
+                )}
               </Box>
             </Box>
             <Box id='right-container-footer' alignSelf={'baseline'} marginBottom={0} padding={2}>
@@ -290,5 +326,43 @@ export default function MessagePage() {
         </Box>
       </Box>
     </Box>
+  );
+}
+
+function MessageRenderer({
+  threadContext,
+  userId,
+}: {
+  threadContext: MessageThread;
+  userId: string;
+}) {
+  const [contextUsers, setContextUsers] = useState<Partial<SecureUser>[] | null>(null);
+
+  useEffect(() => {
+    const fetchContextUsers = async () => {
+      const users = await Promise.all(
+        threadContext.recipients.map((recipient) => UserClient.getUserById(recipient)),
+      );
+      setContextUsers(users as Partial<SecureUser>[]);
+    };
+
+    fetchContextUsers();
+  }, []);
+
+  // Then render the messages
+  return (
+    contextUsers &&
+    threadContext.messages.map((message, index) => {
+      const position = message.sender === userId ? 'end' : 'start';
+      return (
+        <MessageBlurbContainer position={position} key={message._id}>
+          <MessageBlurb
+            body={message.body}
+            position={position}
+            user={contextUsers.find((user) => user._id === message.sender) as SecureUser}
+          />
+        </MessageBlurbContainer>
+      );
+    })
   );
 }

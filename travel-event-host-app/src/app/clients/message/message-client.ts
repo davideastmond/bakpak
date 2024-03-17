@@ -40,5 +40,25 @@ export const MessageClient = {
     const response = await req.json();
     return response as { status: string; id: string };
   },
-  postMessageToThread: async (): Promise<void> => {},
+  postMessageToThread: async ({
+    threadId,
+    content,
+  }: {
+    threadId: string;
+    content: string;
+  }): Promise<MessageThread> => {
+    const endpoint = `/api/messages/threads/${threadId}`;
+
+    const req = await fetch(endpoint, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content }),
+    });
+
+    if (!req.ok) throw new Error('Error: Cannot post message');
+    const response = await req.json();
+    return response as MessageThread; // If successful, this returns an updated thread
+  },
 };

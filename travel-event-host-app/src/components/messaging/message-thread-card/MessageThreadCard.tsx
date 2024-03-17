@@ -1,14 +1,16 @@
+import { UserClient } from '@/app/clients/user/user-client';
 import theme from '@/app/theme';
 import { CustomGenericMuiAvatar } from '@/components/avatar/custom-generic-user-avatar/CustomGenericUserAvatar';
 import { MultiAvatarComponent } from '@/components/avatar/multi-avatar/MultiAvatar';
 import UserAvatar from '@/components/avatar/user-avatar/UserAvatar';
 import { SearchInputField } from '@/components/event-search/search-input-field/SearchInputField';
+import { MessageThread } from '@/models/messaging/message-thread.model';
 import { SecureUser } from '@/types/secure-user';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import LocationPinIcon from '@mui/icons-material/LocationOn';
 import { Box, ButtonBase, Menu, MenuItem, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './styles.module.css';
 /* 
  Looking at the meetup.com website, the other sections have two variations:
@@ -24,33 +26,61 @@ import styles from './styles.module.css';
   
   3. Version 2, with a dropdown menu to add or remove (for new message), otherwise a context menu with [view profile, mute, block, report]
 */
-interface AvatarMessageSummaryCardProps {
-  user: Partial<SecureUser>;
+interface MessageThreadCardProps {
+  baseUser: Partial<SecureUser>;
+  threadContext: MessageThread;
+  onMessageThreadCardClicked?: (threadContextId: string) => void;
   onMenuItemClick?: (action: {
     type: SummarySectionMenuActions;
     context: { id: string; other?: any };
   }) => void;
 }
 
-export const MessageThreadCard = ({ user }: AvatarMessageSummaryCardProps) => {
+export const MessageThreadCard = ({
+  threadContext,
+  baseUser,
+  onMessageThreadCardClicked,
+}: MessageThreadCardProps) => {
+  const [recipients, setRecipients] = useState<Partial<SecureUser>[]>([]);
+
+  const filteredUsers = threadContext.recipients.filter((userId) => userId !== baseUser._id);
+  useEffect(() => {
+    filteredUsers.map((userId) =>
+      UserClient.getUserById(userId).then((user) => setRecipients([...recipients!, user!])),
+    );
+  }, []);
+
+  const handleOnCardClicked = () => {
+    onMessageThreadCardClicked?.(threadContext._id);
+  };
+
   return (
-    <BaseCard users={user} backgroundColor={'white'}>
+    <BaseCard users={recipients} backgroundColor={'white'} onCardClicked={handleOnCardClicked}>
       <Box ml={2} width='100%'>
         <Box>
           {/* TODO: This needs to be styled differently if it's a thread info */}
-          <Typography
-            sx={{ fontWeight: 'bold', color: theme.palette.primary.charcoal, textAlign: 'left ' }}
-          >
-            {user?.firstName} {user?.lastName}
+          <Typography sx={{ color: theme.palette.primary.charcoal, textAlign: 'left ' }}>
+            {/* TODO: what if it's a multi */}
+            {renderMultipleRecipientNames(recipients)}
           </Typography>
         </Box>
         {/* TODO: Fix */}
         {/* <SummarySection cardType='thread' user={user} /> */}
+        <Box>
+          {/* Blurn of the last message */}
+          <Typography sx={{ color: theme.palette.primary.greyDisabled, fontWeight: 'light' }}>
+            {threadContext.messages[threadContext.messages.length - 1].body}
+          </Typography>
+        </Box>
 
         <Box>{/* This section is for time ago or some context menu */}</Box>
       </Box>
     </BaseCard>
   );
+};
+
+const renderMultipleRecipientNames = (users: Partial<SecureUser>[]): string => {
+  return users.map((user) => `${user.firstName}`).join(', ');
 };
 
 export const AvatarMessageHeaderCard = ({
@@ -85,11 +115,13 @@ const BaseCard = ({
   children,
   backgroundColor,
   reverseFlow,
+  onCardClicked,
 }: {
   users: Partial<SecureUser>[] | Partial<SecureUser>;
   children?: JSX.Element;
   backgroundColor?: string;
   reverseFlow?: boolean;
+  onCardClicked?: () => void;
 }) => {
   // The avatar needs to appear on the left or right
   return (
@@ -98,6 +130,7 @@ const BaseCard = ({
       bgcolor={backgroundColor || 'white'}
       padding={2}
       flexDirection={reverseFlow ? 'row-reverse' : 'row'}
+      onClick={() => onCardClicked && onCardClicked()}
       sx={{
         '&:hover': {
           backgroundColor: theme.palette.primary.thirdColorIceLight,
