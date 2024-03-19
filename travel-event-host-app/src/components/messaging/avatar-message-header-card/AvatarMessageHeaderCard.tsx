@@ -42,7 +42,6 @@ export const CurrentThreadRecipientsCard = ({
   baseUser: Partial<SecureUser>;
 }) => {
   const [recipients, setRecipients] = useState<SecureUser[]>([]);
-  console.log('cotxt id', threadContext._id);
 
   useEffect(() => {
     if (threadContext) {
