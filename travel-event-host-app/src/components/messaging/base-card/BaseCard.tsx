@@ -11,12 +11,14 @@ export const BaseCard = ({
   backgroundColor,
   reverseFlow,
   onCardClicked,
+  boxEnclosureStyles,
 }: {
   users: Partial<SecureUser>[] | Partial<SecureUser>;
   children?: JSX.Element;
   backgroundColor?: string;
   reverseFlow?: boolean;
   onCardClicked?: () => void;
+  boxEnclosureStyles?: any;
 }) => {
   // The avatar needs to appear on the left or right
   return (
@@ -31,6 +33,7 @@ export const BaseCard = ({
           backgroundColor: theme.palette.primary.thirdColorIceLight,
           cursor: 'pointer',
         },
+        ...boxEnclosureStyles,
       }}
     >
       <Box className='avatarEnclosure'>
