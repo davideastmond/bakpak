@@ -2,7 +2,7 @@
 import { CustomTextField } from '@/components/custom-fields/CustomFields';
 import Divider from '@mui/material/Divider';
 import Image from 'next/image';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import styles from '../styles.module.css';
 
 export function SearchInputField({
@@ -10,13 +10,24 @@ export function SearchInputField({
   keyword,
   fullWidth,
   placeholder,
+  onInputChanged,
+  id,
 }: {
   handleSearch: (searchInput: string) => void;
   keyword: string;
   fullWidth?: boolean;
   placeholder?: string;
+  onInputChanged?: (searchInput: string) => void;
+  id?: string;
 }) {
   const [searchInput, setSearchInput] = useState<string>(keyword);
+
+  const onInputChangedHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+    if (onInputChanged) {
+      onInputChanged(e.target.value);
+    }
+  };
 
   return (
     <CustomTextField
@@ -28,7 +39,7 @@ export function SearchInputField({
       }}
       fullWidth={fullWidth}
       value={searchInput}
-      onChange={(e) => setSearchInput(e.target.value as string)}
+      onChange={onInputChangedHandler}
       placeholder={placeholder}
       sx={{ fontSize: '2em', flexGrow: 1, '& .MuiInputBase-root': { backgroundColor: 'white' } }}
       InputProps={{
@@ -48,7 +59,7 @@ export function SearchInputField({
           </div>
         ),
       }}
-      id='input-with-icon-adornment'
+      id={id}
     ></CustomTextField>
   );
 }
