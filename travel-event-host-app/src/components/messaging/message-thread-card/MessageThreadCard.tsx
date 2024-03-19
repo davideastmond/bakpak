@@ -26,6 +26,7 @@ interface MessageThreadCardProps {
   baseUser: Partial<SecureUser>;
   threadContext: MessageThread;
   onMessageThreadCardClicked?: (threadContextId: string) => void;
+  selected?: boolean;
   onMenuItemClick?: (action: {
     type: SummarySectionMenuActions;
     context: { id: string; other?: any };
@@ -36,6 +37,7 @@ export const MessageThreadCard = ({
   threadContext,
   baseUser,
   onMessageThreadCardClicked,
+  selected,
 }: MessageThreadCardProps) => {
   const [recipients, setRecipients] = useState<Partial<SecureUser>[]>([]);
 
@@ -51,7 +53,15 @@ export const MessageThreadCard = ({
   };
 
   return (
-    <BaseCard users={recipients} backgroundColor={'white'} onCardClicked={handleOnCardClicked}>
+    <BaseCard
+      users={recipients}
+      backgroundColor={selected ? theme.palette.primary.aliceBlue : 'white'}
+      onCardClicked={handleOnCardClicked}
+      boxEnclosureStyles={{
+        border: selected ? `1px solid ${theme.palette.primary.primaryColorDarkBlue}` : 'none',
+        borderRadius: '5px',
+      }}
+    >
       <Box ml={2} width='100%'>
         <Box>
           {/* TODO: This needs to be styled differently if it's a thread info */}
