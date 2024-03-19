@@ -1,13 +1,7 @@
 'use client';
 import { CustomTextField } from '@/components/custom-fields/CustomFields';
 
-import {
-  AvatarMessageHeaderCard,
-  MessageBlurb,
-  MessageBlurbContainer,
-  MessageThreadCard,
-  NewConversationHeader,
-} from '@/components/messaging/message-thread-card/MessageThreadCard';
+import { MessageThreadCard } from '@/components/messaging/message-thread-card/MessageThreadCard';
 import { Spinner } from '@/components/spinner/Spinner';
 import { useAuthContext } from '@/lib/auth-context';
 import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
@@ -20,6 +14,12 @@ import SendIcon from '@mui/icons-material/Send';
 import { Box, ButtonBase, Divider, IconButton, Typography } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import {
+  AvatarMessageHeaderCard,
+  CurrentThreadRecipientsCard,
+} from '@/components/messaging/avatar-message-header-card/AvatarMessageHeaderCard';
+import { MessageRenderer } from '@/components/messaging/message-renderer/MessageRenderer';
+import { NewConversationHeader } from '@/components/messaging/new-conversation-header/NewConversationHeader';
 import { Suspense, useEffect, useState } from 'react';
 import { MessageClient } from '../clients/message/message-client';
 import { UserClient } from '../clients/user/user-client';
@@ -104,7 +104,7 @@ export default function MessagePage() {
 
     if (!currentThreadContext) return;
 
-    const refreshedThread = await MessageClient.postMessageToThread({
+    await MessageClient.postMessageToThread({
       threadId: currentThreadContext,
       content: chatMessage,
     });
@@ -209,8 +209,6 @@ export default function MessagePage() {
             >
               <Suspense fallback={<Spinner />}>
                 {/* Message thread needs to be rendered */}
-                {/* <MessageThreadCard user={user!} /> */}
-
                 {threadContexts.map((threadContext) => (
                   <MessageThreadCard
                     key={threadContext._id}
@@ -243,9 +241,21 @@ export default function MessagePage() {
               },
             }}
           >
-            <Box id='newConversationHeader'>
-              <NewConversationHeader />
-            </Box>
+            {currentThreadContext === null && (
+              <Box id='newConversationHeader'>
+                <NewConversationHeader />
+              </Box>
+            )}
+            {session && currentThreadContext && !isNewMessage && (
+              <Box>
+                <CurrentThreadRecipientsCard
+                  threadContext={
+                    threadContexts.find((context) => context._id === currentThreadContext)!
+                  }
+                  baseUser={session.user}
+                />
+              </Box>
+            )}
             <Box id='right-container-header'>
               {/* This will have the chat avatar icon with location for new messages */}
               {newMessageRecipients.map((recipient) => (
@@ -326,43 +336,5 @@ export default function MessagePage() {
         </Box>
       </Box>
     </Box>
-  );
-}
-
-function MessageRenderer({
-  threadContext,
-  userId,
-}: {
-  threadContext: MessageThread;
-  userId: string;
-}) {
-  const [contextUsers, setContextUsers] = useState<Partial<SecureUser>[] | null>(null);
-
-  useEffect(() => {
-    const fetchContextUsers = async () => {
-      const users = await Promise.all(
-        threadContext.recipients.map((recipient) => UserClient.getUserById(recipient)),
-      );
-      setContextUsers(users as Partial<SecureUser>[]);
-    };
-
-    fetchContextUsers();
-  }, []);
-
-  // Then render the messages
-  return (
-    contextUsers &&
-    threadContext.messages.map((message, index) => {
-      const position = message.sender === userId ? 'end' : 'start';
-      return (
-        <MessageBlurbContainer position={position} key={message._id}>
-          <MessageBlurb
-            body={message.body}
-            position={position}
-            user={contextUsers.find((user) => user._id === message.sender) as SecureUser}
-          />
-        </MessageBlurbContainer>
-      );
-    })
   );
 }
