@@ -94,10 +94,12 @@ export const MessageBlurb = ({
   user,
   body,
   position,
+  timestamp,
 }: {
   user: Partial<SecureUser>;
   body: string;
   position: 'start' | 'end';
+  timestamp: Date;
 }) => {
   return (
     <BaseCard users={user} backgroundColor={'white'} reverseFlow={position === 'end'}>
@@ -114,7 +116,13 @@ export const MessageBlurb = ({
         <Box>
           <Typography sx={{ color: theme.palette.primary.charcoal }}>{body}</Typography>
         </Box>
-        <Box>{/* {Timestamp needs to go here} */}</Box>
+        <Box>
+          <Box display='flex' justifyContent={'right'}>
+            <Typography sx={{ color: theme.palette.primary.greyDisabled, fontSize: '0.7rem' }}>
+              {dayjs(timestamp).format('h:mm A')}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
     </BaseCard>
   );
@@ -134,11 +142,11 @@ export const MessageBlurbContainer = ({
   );
 };
 
-export const TimestampStrip = ({ timestamp }: { timestamp: Date }) => {
+export const TimestampStrip = ({ dateString }: { dateString: string }) => {
   return (
     <Box display='flex' justifyContent={'center'} padding={1}>
       <Typography sx={{ color: theme.palette.primary.greyDisabled, textTransform: 'uppercase' }}>
-        {dayjs(timestamp).format('MMM D, YYYY')}
+        {dateString}
       </Typography>
     </Box>
   );
