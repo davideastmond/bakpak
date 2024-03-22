@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, ButtonBase, Divider, IconButton, Typography } from '@mui/material';
+import { Box, ButtonBase, Divider, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
@@ -35,6 +35,9 @@ export default function MessagePage() {
   const [isNewMessage, setIsNewMessage] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chatMessage, setChatMessage] = useState<string>('');
+
+  const [leftContainerHeaderContextMenuAnchorEl, setLeftContainerHeaderContextMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
   const { session } = useAuthContext();
 
   const searchParams = useSearchParams();
@@ -63,8 +66,6 @@ export default function MessagePage() {
         }
         return;
       }
-
-      // If
     };
 
     initializeContexts();
@@ -72,7 +73,7 @@ export default function MessagePage() {
 
   const fetchNewMessageUser = async (id: string) => {
     const targetUser = await UserClient.getUserById(id);
-    setNewMessageRecipients([targetUser as SecureUser]);
+    setNewMessageRecipients([...newMessageRecipients, targetUser as SecureUser]);
   };
 
   const fetchThreadContexts = async (): Promise<MessageThread[]> => {
@@ -110,6 +111,18 @@ export default function MessagePage() {
     });
     setChatMessage('');
     await fetchThreadContexts();
+  };
+
+  const handleDeleteThreadInContext = async () => {
+    if (!currentThreadContext) return;
+    setIsLoading(true);
+    await MessageClient.patchDeleteRecipientFromThread(currentThreadContext);
+    await fetchThreadContexts();
+
+    // When a context is deleted, we should reset the current context
+    setCurrentThreadContext(null);
+
+    setIsLoading(false);
   };
 
   return (
@@ -196,9 +209,26 @@ export default function MessagePage() {
                 </ButtonBase>
               </Box>
               <Box>
-                <IconButton>
+                {/* Left side header context menu (allow for deleting the thread context) */}
+                <IconButton
+                  onClick={(e) => setLeftContainerHeaderContextMenuAnchorEl(e.currentTarget)}
+                >
                   <LinearScaleIcon sx={{ color: theme.palette.primary.charcoal }} />
                 </IconButton>
+                {/* Let's render a context menu here, which will delete the current context. */}
+                <Menu
+                  id='left-container-header-context-menu'
+                  anchorEl={leftContainerHeaderContextMenuAnchorEl}
+                  open={Boolean(leftContainerHeaderContextMenuAnchorEl)}
+                  onClose={() => setLeftContainerHeaderContextMenuAnchorEl(null)}
+                >
+                  <MenuItem
+                    disabled={Boolean(currentThreadContext === null)}
+                    onClick={handleDeleteThreadInContext} // Here we send request to API to delete a threadContext
+                  >
+                    Delete Thread
+                  </MenuItem>
+                </Menu>
               </Box>
             </Box>
             <Box
@@ -214,6 +244,7 @@ export default function MessagePage() {
                     key={threadContext._id}
                     baseUser={session?.user}
                     threadContext={threadContext}
+                    selected={currentThreadContext === threadContext._id}
                     onMessageThreadCardClicked={(threadId) => setCurrentThreadContext(threadId)}
                   />
                 ))}
@@ -222,7 +253,7 @@ export default function MessagePage() {
             <Box bgcolor={'white'} p={2}>
               {/* Edit icon */}
               <Box display='flex' justifyContent={'right'}>
-                <IconButton>
+                <IconButton onClick={() => setCurrentThreadContext(null)}>
                   <EditIcon />
                 </IconButton>
               </Box>
