@@ -38,38 +38,41 @@ export default function MessagePage() {
 
   const [leftContainerHeaderContextMenuAnchorEl, setLeftContainerHeaderContextMenuAnchorEl] =
     useState<null | HTMLElement>(null);
-  const { session } = useAuthContext();
 
+  const [isNewMessageThreadMode, setIsNewMessageThreadMode] = useState<boolean>(false);
+
+  const { session } = useAuthContext();
   const searchParams = useSearchParams();
   const router = useRouter();
+
   useEffect(() => {
-    const initializeContexts = async () => {
-      const targetUserId = searchParams.get('target');
-      const newMessageParam = searchParams.get('newMessage');
-      const fetchedThreadContexts = await fetchThreadContexts();
-
-      // Even though it could be a new message, there could be a thread already existing for the user.
-      // If one does exist, we should set the current thread context to that and switch the isMessage flag to false.
-      const existingThread = fetchedThreadContexts.find((thread) => {
-        return (
-          thread.originator === session?.user._id &&
-          thread.recipients.includes(targetUserId as string)
-        );
-      });
-
-      if (newMessageParam && !isNewMessage && isValidMongoId(targetUserId as string)) {
-        if (!existingThread) {
-          setIsNewMessage(true);
-          fetchNewMessageUser(targetUserId as string);
-        } else {
-          router && router.replace('/messages');
-        }
-        return;
-      }
-    };
-
-    initializeContexts();
+    initializeThreadContexts();
   }, [session]);
+
+  const initializeThreadContexts = async () => {
+    const targetUserId = searchParams.get('target');
+    const newMessageParam = searchParams.get('newMessage');
+    const fetchedThreadContexts = await fetchThreadContexts();
+
+    // Even though it could be a new message, there could be a thread already existing for the user.
+    // If one does exist, we should set the current thread context to that and switch the isMessage flag to false.
+    const existingThread = fetchedThreadContexts.find((thread) => {
+      return (
+        thread.originator === session?.user._id &&
+        thread.recipients.includes(targetUserId as string)
+      );
+    });
+
+    if (newMessageParam && !isNewMessage && isValidMongoId(targetUserId as string)) {
+      if (!existingThread) {
+        setIsNewMessage(true);
+        fetchNewMessageUser(targetUserId as string);
+      } else {
+        router && router.replace('/messages');
+      }
+      return;
+    }
+  };
 
   const fetchNewMessageUser = async (id: string) => {
     const targetUser = await UserClient.getUserById(id);
@@ -123,6 +126,20 @@ export default function MessagePage() {
     setCurrentThreadContext(null);
 
     setIsLoading(false);
+  };
+
+  const handleCancelNewMessage = () => {
+    setIsNewMessageThreadMode(false);
+    setCurrentThreadContext(null);
+    // Clear the new
+    setNewMessageRecipients([]);
+  };
+
+  const handleAddNewMessageUser = async (userId: string) => {
+    // We can check if the user is already in the list of recipients. If so, ignore. Otherwise, fetch from the server
+    if (newMessageRecipients.find((recipient) => recipient._id === userId)) return;
+
+    await fetchNewMessageUser(userId);
   };
 
   return (
@@ -245,15 +262,26 @@ export default function MessagePage() {
                     baseUser={session?.user}
                     threadContext={threadContext}
                     selected={currentThreadContext === threadContext._id}
-                    onMessageThreadCardClicked={(threadId) => setCurrentThreadContext(threadId)}
+                    onMessageThreadCardClicked={(threadId) => {
+                      setCurrentThreadContext(threadId);
+                      setIsNewMessageThreadMode(false);
+                      setNewMessageRecipients([]);
+                    }}
                   />
                 ))}
               </Suspense>
             </Box>
             <Box bgcolor={'white'} p={2}>
-              {/* Edit icon */}
+              {/* Start a new message*/}
               <Box display='flex' justifyContent={'right'}>
-                <IconButton onClick={() => setCurrentThreadContext(null)}>
+                <IconButton
+                  onClick={() => {
+                    setCurrentThreadContext(null);
+                    setIsNewMessageThreadMode(true);
+                    setIsNewMessage(true);
+                  }}
+                  disabled={isNewMessageThreadMode}
+                >
                   <EditIcon />
                 </IconButton>
               </Box>
@@ -263,7 +291,7 @@ export default function MessagePage() {
           <Box
             id='right-container-main'
             width='100%'
-            height='85vh'
+            height='fit-content'
             bgcolor={'white'}
             sx={{
               [theme.breakpoints.up('md')]: {
@@ -274,7 +302,11 @@ export default function MessagePage() {
           >
             {currentThreadContext === null && (
               <Box id='newConversationHeader'>
-                <NewConversationHeader />
+                {/* Here is where we handle when user clicks a user search result dropdown item */}
+                <NewConversationHeader
+                  onCancelClicked={handleCancelNewMessage}
+                  onSearchResultClicked={handleAddNewMessageUser}
+                />
               </Box>
             )}
             {session && currentThreadContext && !isNewMessage && (
@@ -287,15 +319,18 @@ export default function MessagePage() {
                 />
               </Box>
             )}
-            <Box id='right-container-header'>
+            <Box id='right-container-header' p={2}>
               {/* This will have the chat avatar icon with location for new messages */}
-              {newMessageRecipients.map((recipient) => (
-                <AvatarMessageHeaderCard
-                  key={recipient._id}
-                  user={recipient}
-                  onMenuItemClick={(e) => console.log(e)}
-                />
-              ))}
+              <Box mb={3}>
+                <Typography sx={{ color: theme.palette.primary.charcoal }}>
+                  Send message to:
+                </Typography>
+              </Box>
+              <Box display='flex'>
+                {newMessageRecipients.map((recipient) => (
+                  <AvatarMessageHeaderCard key={recipient._id} user={recipient} />
+                ))}
+              </Box>
               <Divider
                 orientation='horizontal'
                 sx={{ borderColor: theme.palette.primary.backgroundColorLightPurple, mb: 2 }}
