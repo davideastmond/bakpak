@@ -43,3 +43,39 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   await (threadContext as any).save();
   return NextResponse.json(threadContext, { status: 200 });
 }
+
+export async function PATCH(_: NextRequest, { params }: { params: { id: string } }) {
+  /* The philosophy of message threads when some user wants to delete it on the client side 
+    is to delete the requesting user from the recipients list (instead of deleting the whole thread)
+  */
+  const { id } = params;
+  if (!isValidMongoId(id))
+    return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
+
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+  /* The id of the thread is in the URL (params) and the user who should
+   be removed from the recipients list is in the session object.
+   We should validate that the requesting user is part of the recipients list 
+   */
+
+  await connectMongoDB();
+  const threadContext: MessageThread | null = await MessageThreadRepository.findById(id);
+
+  if (!threadContext)
+    return NextResponse.json({ message: `Thread ${id} not found` }, { status: 404 });
+
+  if (!threadContext.recipients.includes(session.user._id))
+    return NextResponse.json(
+      { message: `user: ${session.user._id} not in threadContext: ${id}` },
+      { status: 400 },
+    );
+
+  threadContext.recipients = threadContext.recipients.filter(
+    (userId) => userId !== session.user._id,
+  );
+  await (threadContext as any).save();
+
+  return NextResponse.json(threadContext, { status: 200 });
+}
