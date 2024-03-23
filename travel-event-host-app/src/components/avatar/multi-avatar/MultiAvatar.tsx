@@ -22,7 +22,9 @@ export function MultiAvatarComponent({ users }: MultiAvatarComponentProps) {
             key={index}
             user={user}
             imageClassName={styles.miniImage}
-            MuiAvatarComponent={<CustomGenericMuiAvatar theme={theme} />}
+            MuiAvatarComponent={
+              <CustomGenericMuiAvatar theme={theme} className={styles.miniImage} />
+            }
           />
         ))}
       </Box>
