@@ -41,8 +41,8 @@ export const MessageThreadCard = ({
 }: MessageThreadCardProps) => {
   const [recipients, setRecipients] = useState<Partial<SecureUser>[]>([]);
 
-  const filteredUsers = threadContext.recipients.filter((userId) => userId !== baseUser?._id);
   useEffect(() => {
+    const filteredUsers = threadContext.recipients.filter((userId) => userId !== baseUser?._id);
     filteredUsers.map((userId) =>
       UserClient.getUserById(userId).then((user) => setRecipients([...recipients!, user!])),
     );
