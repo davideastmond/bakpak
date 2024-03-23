@@ -6,7 +6,13 @@ import { Box, ButtonBase, ClickAwayListener, Typography } from '@mui/material';
 import { useState } from 'react';
 import { UserSearchResultDropdown } from '../user-search-result-dropdown/UserSearchResultDropDown';
 
-export function NewConversationHeader() {
+export function NewConversationHeader({
+  onCancelClicked,
+  onSearchResultClicked,
+}: {
+  onCancelClicked?: () => void;
+  onSearchResultClicked: (userId: string) => void;
+}) {
   const [userSearchQueryResults, setUserSearchQueryResults] = useState<Partial<SecureUser>[]>([]);
 
   const performSearchQuery = async (query: string) => {
@@ -36,7 +42,7 @@ export function NewConversationHeader() {
           </Typography>
         </Box>
         <Box>
-          <ButtonBase>
+          <ButtonBase onClick={() => onCancelClicked && onCancelClicked()}>
             <Typography
               sx={{
                 color: theme.palette.primary.primaryColorDarkBlue,
@@ -64,7 +70,10 @@ export function NewConversationHeader() {
           <UserSearchResultDropdown
             isOpen={userSearchQueryResults.length > 0}
             searchResults={userSearchQueryResults}
-            onMenuItemClick={(userId) => console.log(userId)}
+            onMenuItemClick={(userId) => {
+              onSearchResultClicked(userId);
+              setUserSearchQueryResults([]);
+            }}
           />
         </Box>
       </ClickAwayListener>
