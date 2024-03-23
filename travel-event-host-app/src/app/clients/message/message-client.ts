@@ -40,6 +40,17 @@ export const MessageClient = {
     const response = await req.json();
     return response as { status: string; id: string };
   },
+  patchDeleteRecipientFromThread: async (threadId: string): Promise<MessageThread> => {
+    const endpoint = `/api/messages/threads/${threadId}`;
+    const req = await fetch(endpoint, {
+      method: 'PATCH',
+    });
+    if (!req.ok) {
+      throw new Error('Error: Cannot delete recipient from thread');
+    }
+    const response = await req.json();
+    return response as MessageThread; // If successful, this returns an updated thread
+  },
   postMessageToThread: async ({
     threadId,
     content,
