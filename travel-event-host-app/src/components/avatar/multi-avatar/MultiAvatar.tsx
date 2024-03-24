@@ -15,9 +15,9 @@ interface MultiAvatarComponentProps {
 // They should be staggered from left to right, layered atop each other
 export function MultiAvatarComponent({ users }: MultiAvatarComponentProps) {
   return (
-    <Box>
-      <Box>
-        {users.slice(0, 3).map((user, index) => (
+    <Box display='flex' className='MultiAvatarComponent'>
+      {users.slice(0, 3).map((user, index) => (
+        <Box key={index}>
           <UserAvatar
             key={index}
             user={user}
@@ -26,8 +26,8 @@ export function MultiAvatarComponent({ users }: MultiAvatarComponentProps) {
               <CustomGenericMuiAvatar theme={theme} className={styles.miniImage} />
             }
           />
-        ))}
-      </Box>
+        </Box>
+      ))}
     </Box>
   );
 }
