@@ -42,12 +42,17 @@ export const MessageThreadCard = ({
   const [recipients, setRecipients] = useState<Partial<SecureUser>[]>([]);
 
   useEffect(() => {
-    const filteredUsers = threadContext.recipients.filter((userId) => userId !== baseUser?._id);
-    filteredUsers.map((userId) =>
-      UserClient.getUserById(userId).then((user) => setRecipients([...recipients!, user!])),
-    );
+    getRecipientUsers();
   }, []);
 
+  const getRecipientUsers = async () => {
+    const filteredUsers = threadContext.recipients.filter((userId) => userId !== baseUser?._id);
+
+    const recipientUsers = await Promise.all(
+      filteredUsers.map((userId) => UserClient.getUserById(userId)),
+    );
+    setRecipients(recipientUsers as Partial<SecureUser>[]);
+  };
   const handleOnCardClicked = () => {
     onMessageThreadCardClicked?.(threadContext._id);
   };

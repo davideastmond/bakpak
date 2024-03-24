@@ -2,7 +2,8 @@ import { UserClient } from '@/app/clients/user/user-client';
 import theme from '@/app/theme';
 import { MessageThread } from '@/models/messaging/message-thread.model';
 import { SecureUser } from '@/types/secure-user';
-import { Box, Typography } from '@mui/material';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { BaseCard } from '../base-card/BaseCard';
 import { SummarySection } from '../summary-section/SummarySection';
@@ -10,9 +11,13 @@ import { SummarySection } from '../summary-section/SummarySection';
 export const AvatarMessageHeaderCard = ({
   user,
   onMenuItemClick,
+  showRemoveIcon,
+  onRemoveIconClick,
 }: {
   user: Partial<SecureUser>;
   onMenuItemClick?: (e: any) => void;
+  showRemoveIcon?: boolean;
+  onRemoveIconClick?: (userId: string) => void;
 }) => {
   return (
     <BaseCard users={user}>
@@ -30,6 +35,19 @@ export const AvatarMessageHeaderCard = ({
         <SummarySection cardType='info' user={user} onMenuClick={onMenuItemClick} />
         <Box>{/* This section is for time ago or some context menu */}</Box>
       </Box>
+      {showRemoveIcon && (
+        <Box display='flex' justifyContent={'right'}>
+          <IconButton
+            onClick={() => {
+              if (onRemoveIconClick) {
+                onRemoveIconClick(user._id!);
+              }
+            }}
+          >
+            <RemoveCircleIcon />
+          </IconButton>
+        </Box>
+      )}
     </BaseCard>
   );
 };
