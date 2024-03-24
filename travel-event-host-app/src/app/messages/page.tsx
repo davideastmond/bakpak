@@ -156,6 +156,12 @@ export default function MessagePage() {
     await fetchNewMessageUser(userId);
   };
 
+  const handleRemoveNewMessageRecipient = (userId: string) => {
+    // This removes a user from the potential new recipients list for new messages
+    const filteredRecipients = newMessageRecipients.filter((recipient) => recipient._id !== userId);
+    setNewMessageRecipients(filteredRecipients);
+  };
+
   if (status === AuthStatus.Unauthenticated) {
     return router.replace('/auth/signin');
   }
@@ -348,7 +354,12 @@ export default function MessagePage() {
               )}
               <Box display='flex'>
                 {newMessageRecipients.map((recipient) => (
-                  <AvatarMessageHeaderCard key={recipient._id} user={recipient} />
+                  <AvatarMessageHeaderCard
+                    key={recipient._id}
+                    user={recipient}
+                    showRemoveIcon
+                    onRemoveIconClick={handleRemoveNewMessageRecipient}
+                  />
                 ))}
               </Box>
               <Divider

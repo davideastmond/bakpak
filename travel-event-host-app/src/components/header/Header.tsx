@@ -184,7 +184,7 @@ export function Header() {
           </Box>
           {status === AuthStatus.Authenticated ? (
             <>
-              <Box display='flex' flexDirection={'column'}>
+              <Box display='flex' flexDirection={'column'} gap={0}>
                 <Box alignSelf={'center'}>
                   <IconButton>
                     <Link href='/messages'>
@@ -193,6 +193,7 @@ export function Header() {
                   </IconButton>
                 </Box>
                 <Box
+                  marginTop={'-12px'}
                   sx={{
                     [theme.breakpoints.down(431)]: {
                       display: 'none',

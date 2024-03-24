@@ -1,9 +1,11 @@
 .navMain {
-  margin-top: 5px;
+  margin-top: 10px;
 }
 .header {
   position: sticky;
-  padding: 1.5em;
+  /* padding: 1.5em; */
+  padding-left: 1rem;
+  padding-right: 1rem;
   width: 100%;
   background-color: var(--secondary-color-dark-black);
   top: 0;
