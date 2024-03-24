@@ -14,7 +14,7 @@ export const MessageClient = {
     const endpoint = `/api/messages/threads`;
     const req = await fetch(endpoint);
     if (!req.ok) {
-      throw new Error('Error: Cannot fetch threads');
+      throw new Error('Error: Cannot fetch all thread contexts');
     }
     const res = await req.json();
     return res as MessageThread[];
