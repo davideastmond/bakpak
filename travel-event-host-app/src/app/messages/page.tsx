@@ -20,6 +20,7 @@ import {
 } from '@/components/messaging/avatar-message-header-card/AvatarMessageHeaderCard';
 import { MessageRenderer } from '@/components/messaging/message-renderer/MessageRenderer';
 import { NewConversationHeader } from '@/components/messaging/new-conversation-header/NewConversationHeader';
+import { AuthStatus } from '@/lib/auth-status';
 import { Suspense, useEffect, useState } from 'react';
 import { MessageClient } from '../clients/message/message-client';
 import { UserClient } from '../clients/user/user-client';
@@ -41,7 +42,7 @@ export default function MessagePage() {
 
   const [isNewMessageThreadMode, setIsNewMessageThreadMode] = useState<boolean>(false);
 
-  const { session } = useAuthContext();
+  const { session, status } = useAuthContext();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -85,9 +86,14 @@ export default function MessagePage() {
     // We will also need to fetch the last message in each thread.
     // We will also need to fetch the user's avatar and name.
 
-    const threadContexts = await MessageClient.getAllThreadContexts();
-    setThreadContexts(threadContexts);
-    return threadContexts;
+    try {
+      const threadContexts = await MessageClient.getAllThreadContexts();
+      setThreadContexts(threadContexts);
+      return threadContexts;
+    } catch (e: any) {
+      console.error(e);
+      return [];
+    }
   };
 
   const handleSendMessage = async () => {
@@ -95,6 +101,7 @@ export default function MessagePage() {
     // Grab context of the thread if available.
     // If it's a new message, we need to create a new thread.
     if (isNewMessage) {
+      setIsLoading(true);
       await MessageClient.createThreadAndPostMessage({
         initiator: session?.user._id as string,
         recipients: newMessageRecipients.map((recipient) => recipient._id),
@@ -103,17 +110,22 @@ export default function MessagePage() {
       // Refresh the thread contexts
       await fetchThreadContexts();
       setChatMessage('');
+      setIsNewMessage(false);
+      setIsNewMessageThreadMode(false);
+      setIsLoading(false);
       return;
     }
 
     if (!currentThreadContext) return;
 
+    setIsLoading(true);
     await MessageClient.postMessageToThread({
       threadId: currentThreadContext,
       content: chatMessage,
     });
     setChatMessage('');
     await fetchThreadContexts();
+    setIsLoading(false);
   };
 
   const handleDeleteThreadInContext = async () => {
@@ -133,6 +145,8 @@ export default function MessagePage() {
     setCurrentThreadContext(null);
     // Clear the new
     setNewMessageRecipients([]);
+    setIsNewMessage(false);
+    setIsNewMessageThreadMode(false);
   };
 
   const handleAddNewMessageUser = async (userId: string) => {
@@ -141,6 +155,10 @@ export default function MessagePage() {
 
     await fetchNewMessageUser(userId);
   };
+
+  if (status === AuthStatus.Unauthenticated) {
+    return router.replace('/auth/signin');
+  }
 
   return (
     <Box
@@ -300,7 +318,7 @@ export default function MessagePage() {
               },
             }}
           >
-            {currentThreadContext === null && (
+            {currentThreadContext === null && isNewMessage && (
               <Box id='newConversationHeader'>
                 {/* Here is where we handle when user clicks a user search result dropdown item */}
                 <NewConversationHeader
@@ -321,11 +339,13 @@ export default function MessagePage() {
             )}
             <Box id='right-container-header' p={2}>
               {/* This will have the chat avatar icon with location for new messages */}
-              <Box mb={3}>
-                <Typography sx={{ color: theme.palette.primary.charcoal }}>
-                  Send message to:
-                </Typography>
-              </Box>
+              {isNewMessage && isNewMessageThreadMode && (
+                <Box mb={3}>
+                  <Typography sx={{ color: theme.palette.primary.charcoal }}>
+                    Send message to:
+                  </Typography>
+                </Box>
+              )}
               <Box display='flex'>
                 {newMessageRecipients.map((recipient) => (
                   <AvatarMessageHeaderCard key={recipient._id} user={recipient} />
@@ -380,7 +400,7 @@ export default function MessagePage() {
                   InputProps={{
                     endAdornment: (
                       <IconButton
-                        disabled={chatMessage.trim().length < 1}
+                        disabled={isLoading || chatMessage.trim().length < 1}
                         onClick={handleSendMessage}
                       >
                         <SendIcon sx={{ color: theme.palette.primary.primaryColorDarkBlue }} />
