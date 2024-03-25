@@ -8,20 +8,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { BaseCard } from '../base-card/BaseCard';
 import { SummarySectionMenuActions } from '../summary-section/SummarySection';
-/* 
- Looking at the meetup.com website, the other sections have two variations:
- 1. Message thread version:
-    (middle column)
-    - User first and name
-    - Excerpt of latest message
-    - Time ago (on the third column)
 
-  2. (Middle column)
-    - User first name in bold
-    - Location icon with the user's location
-  
-  3. Version 2, with a dropdown menu to add or remove (for new message), otherwise a context menu with [view profile, mute, block, report]
-*/
 interface MessageThreadCardProps {
   baseUser: Partial<SecureUser>;
   threadContext: MessageThread;
@@ -53,6 +40,7 @@ export const MessageThreadCard = ({
     );
     setRecipients(recipientUsers as Partial<SecureUser>[]);
   };
+
   const handleOnCardClicked = () => {
     onMessageThreadCardClicked?.(threadContext._id);
   };
@@ -75,8 +63,6 @@ export const MessageThreadCard = ({
             {renderMultipleRecipientNames(recipients)}
           </Typography>
         </Box>
-        {/* TODO: Fix */}
-        {/* <SummarySection cardType='thread' user={user} /> */}
         <Box>
           {/* Blurb of the last message */}
           <Typography sx={{ color: theme.palette.primary.greyDisabled, fontWeight: 'light' }}>
@@ -107,7 +93,7 @@ export const MessageBlurb = ({
   timestamp: Date;
 }) => {
   return (
-    <BaseCard users={user} backgroundColor={'white'} reverseFlow={position === 'end'}>
+    <BaseCard users={user && user} backgroundColor={'white'} reverseFlow={position === 'end'}>
       <Box
         borderRadius={'5px'}
         p={2}
