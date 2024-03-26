@@ -1,0 +1,7 @@
+.newDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgb(74, 74, 162);
+  margin-right: 8px;
+}

@@ -3,11 +3,7 @@ import { MessageThread } from '@/models/messaging/message-thread.model';
 import { SecureUser } from '@/types/secure-user';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import {
-  MessageBlurb,
-  MessageBlurbContainer,
-  TimestampStrip,
-} from '../message-thread-card/MessageThreadCard';
+import { MessageBlurb, MessageBlurbContainer, TimestampStrip } from '../message-blurb/MessageBlurb';
 
 export function MessageRenderer({
   threadContext,
