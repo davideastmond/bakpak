@@ -7,6 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { BaseCard } from '../base-card/BaseCard';
 import { SummarySectionMenuActions } from '../summary-section/SummarySection';
+import { threadHasUnreadMessages } from '../utils/unread-message';
 import styles from './styles.module.css';
 
 interface MessageThreadCardProps {
@@ -69,11 +70,11 @@ export const MessageThreadCard = ({
             {threadContext.messages[threadContext.messages.length - 1].body}
           </Typography>
         </Box>
-
-        <Box>{/* This section is for time ago or some context menu */}</Box>
-        <Box className='unread-message-indicator' display='flex' justifyContent={'right'}>
-          <Box className={styles.newDot} />
-        </Box>
+        {threadHasUnreadMessages(threadContext, baseUser._id!) && (
+          <Box className='unread-message-indicator' display='flex' justifyContent={'right'}>
+            <Box className={styles.newDot} />
+          </Box>
+        )}
       </Box>
     </BaseCard>
   );

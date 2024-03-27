@@ -10,14 +10,14 @@ interface MultiAvatarComponentProps {
 }
 
 // This component is mainly for a chat message thread context. If a thread has multiple people, we want to show their avatars in a single component.
-// We should show max 3 avatars. If there are more than 4, we should show the first 4 and a +{n} label.
+// We should show max 3 avatars. If there are more than 4, we should show the first 3 and a +{n} label.
 // If there are 3 or fewer, we should show them all.
 // They should be staggered from left to right, layered atop each other
 export function MultiAvatarComponent({ users }: MultiAvatarComponentProps) {
   return (
     <Box display='flex' className='MultiAvatarComponent'>
       {users.slice(0, 3).map((user, index) => (
-        <Box key={index}>
+        <Box key={`${user._id}_index`}>
           <UserAvatar
             key={index}
             user={user}

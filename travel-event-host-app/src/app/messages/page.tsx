@@ -138,6 +138,8 @@ export default function MessagePage() {
     setCurrentThreadContext(null);
 
     setIsLoading(false);
+
+    setLeftContainerHeaderContextMenuAnchorEl(null);
   };
 
   const handleCancelNewMessage = () => {
@@ -160,6 +162,17 @@ export default function MessagePage() {
     // This removes a user from the potential new recipients list for new messages
     const filteredRecipients = newMessageRecipients.filter((recipient) => recipient._id !== userId);
     setNewMessageRecipients(filteredRecipients);
+  };
+
+  const handleThreadCardClicked = async (threadId: string) => {
+    // We could check if the thread is already marked as read. If so, not do this request
+
+    await MessageClient.patchMarkThreadAsRead(threadId);
+    await fetchThreadContexts();
+    // Mark a thread context as read
+    setCurrentThreadContext(threadId);
+    setIsNewMessageThreadMode(false);
+    setNewMessageRecipients([]);
   };
 
   if (status === AuthStatus.Unauthenticated) {
@@ -286,11 +299,7 @@ export default function MessagePage() {
                     baseUser={session?.user}
                     threadContext={threadContext}
                     selected={currentThreadContext === threadContext._id}
-                    onMessageThreadCardClicked={(threadId) => {
-                      setCurrentThreadContext(threadId);
-                      setIsNewMessageThreadMode(false);
-                      setNewMessageRecipients([]);
-                    }}
+                    onMessageThreadCardClicked={handleThreadCardClicked}
                   />
                 ))}
               </Suspense>

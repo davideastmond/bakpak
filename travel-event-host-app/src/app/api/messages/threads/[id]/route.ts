@@ -38,6 +38,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     body: content,
     recipients: threadContext.recipients,
     timestamp: new Date(),
+    readStatus: {
+      ...threadContext.recipients.reduce((acc, user) => ({ ...acc, [user]: false }), {}),
+      [session.user._id]: true,
+    },
   } as any);
 
   await (threadContext as any).save();

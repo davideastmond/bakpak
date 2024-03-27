@@ -14,7 +14,7 @@ export const BaseCard = ({
   boxEnclosureStyles,
 }: {
   users: Partial<SecureUser>[] | Partial<SecureUser>;
-  children?: JSX.Element;
+  children?: JSX.Element | undefined | null | (JSX.Element | null | undefined)[];
   backgroundColor?: string;
   reverseFlow?: boolean;
   onCardClicked?: () => void;

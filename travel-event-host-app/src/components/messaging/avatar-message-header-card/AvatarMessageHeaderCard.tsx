@@ -35,7 +35,7 @@ export const AvatarMessageHeaderCard = ({
         <SummarySection cardType='info' user={user} onMenuClick={onMenuItemClick} />
         <Box>{/* This section is for time ago or some context menu */}</Box>
       </Box>
-      {showRemoveIcon && (
+      {showRemoveIcon ? (
         <Box display='flex' justifyContent={'right'}>
           <IconButton
             onClick={() => {
@@ -47,7 +47,7 @@ export const AvatarMessageHeaderCard = ({
             <RemoveCircleIcon />
           </IconButton>
         </Box>
-      )}
+      ) : null}
     </BaseCard>
   );
 };

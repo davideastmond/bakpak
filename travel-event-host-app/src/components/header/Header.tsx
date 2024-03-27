@@ -1,4 +1,5 @@
 'use client';
+import { MessageClient } from '@/app/clients/message/message-client';
 import { HeaderIconTextSize } from '@/app/common-styles/text-sizes';
 import theme from '@/app/theme';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
@@ -26,15 +27,20 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { HeaderBarAvatar } from '../avatar/header-bar-avatar/HeaderBarAvatar';
 import { CommonButton } from '../common-button/Common-Button';
+import { useInterval } from '../interval/UseIntervalHook';
+import { threadHasUnreadMessages } from '../messaging/utils/unread-message';
 import { Spinner } from '../spinner/Spinner';
 import styles from './styles.module.css';
 
 export function Header() {
-  const { session, status } = useAuthContext();
   const [lang, setLang] = useState<Language>(Language.En);
   const [navMenuIsOpen, setnavMenuIsOpen] = useState<boolean>(false);
-  const router = useRouter();
+  const [hasMessageNotifications, setHasMessageNotifications] = useState<boolean>(false);
+
+  const { session, status } = useAuthContext();
   const { appStatus, appDispatch } = useAppContext();
+
+  const router = useRouter();
   const urlPathname = usePathname();
 
   const navigateToMyProfile = () => {
@@ -49,6 +55,27 @@ export function Header() {
       router.push('/auth/signin');
     }
   };
+
+  useInterval(async () => {
+    // Check for new messages
+    // If there are new messages, set hasMessageNotifications to true
+    try {
+      // We fetch all of the thread contexts. We have to loop through them all and find any unread messages
+      const threadContexts = await MessageClient.getAllThreadContexts();
+
+      const unreadMessages = threadContexts.some((thread) =>
+        threadHasUnreadMessages(thread, session?.user?._id),
+      );
+
+      if (unreadMessages) {
+        setHasMessageNotifications(true);
+        return;
+      }
+      setHasMessageNotifications(false);
+    } catch (error: any) {
+      console.error('polling error');
+    }
+  }, 5000);
 
   if (status === AuthStatus.Loading)
     return (
@@ -186,11 +213,16 @@ export function Header() {
             <>
               <Box display='flex' flexDirection={'column'} gap={0}>
                 <Box alignSelf={'center'}>
-                  <IconButton>
-                    <Link href='/messages'>
-                      <MessageIcon sx={{ color: theme.palette.primary.thirdColorIceLight }} />
-                    </Link>
-                  </IconButton>
+                  <Box className='headerBarMessageIconContainer'>
+                    {hasMessageNotifications && (
+                      <Box className={styles.messageNotificationDot}></Box>
+                    )}
+                    <IconButton>
+                      <Link href='/messages'>
+                        <MessageIcon sx={{ color: theme.palette.primary.thirdColorIceLight }} />
+                      </Link>
+                    </IconButton>
+                  </Box>
                 </Box>
                 <Box
                   marginTop={'-12px'}
