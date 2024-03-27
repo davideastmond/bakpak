@@ -7,4 +7,5 @@ export const messageSchema = new Schema<Message>({
   body: { type: String, required: true },
   timestamp: { type: Date, required: true, default: Date.now() },
   recipients: { type: [String], required: true }, // user ids of people who received the message
+  readStatus: { type: Schema.Types.Mixed, required: true, default: {} }, // key is user id, value is whether the user has read the message
 });

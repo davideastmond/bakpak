@@ -5,4 +5,5 @@ export interface Message {
   body: string;
   timestamp: Date;
   recipients: string[]; // user ids of people who received the message
+  readStatus: { [key: string]: boolean }; // key is user id, value is whether the user has read the message
 }

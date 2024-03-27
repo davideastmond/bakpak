@@ -8,7 +8,7 @@ import authOptions from '../../auth/auth-options';
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const requestBody = await req.json();
-  const session = getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -48,8 +48,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
       body: message,
       timestamp: new Date(),
       recipients: [...recipientUsers, initiatorUser].map((user) => user._id),
+      readStatus: {
+        ...recipientUsers.reduce((acc, user) => ({ ...acc, [user._id]: false }), {}),
+        [session.user._id]: true,
+      },
     });
-
+    console.log(existingThread.messages);
     await existingThread.save();
 
     return NextResponse.json({ status: 'success', id: existingThread._id }, { status: 201 });
@@ -68,8 +72,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     body: message,
     timestamp: new Date(),
     recipients: [...recipientUsers.map((user) => user._id), initiatorUser._id],
+    readStatus: {
+      ...recipientUsers.reduce((acc, user) => ({ ...acc, [user._id]: false }), {}),
+      [session.user._id]: true,
+    },
   });
 
+  console.log(newThread.messages);
   await newThread.save();
 
   return NextResponse.json({ status: 'success', id: newThread._id }, { status: 201 });

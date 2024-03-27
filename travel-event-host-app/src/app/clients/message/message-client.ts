@@ -72,4 +72,15 @@ export const MessageClient = {
     const response = await req.json();
     return response as MessageThread; // If successful, this returns an updated thread
   },
+  patchMarkThreadAsRead: async (threadId: string): Promise<MessageThread> => {
+    const endpoint = `/api/messages/threads/${threadId}/read`;
+    const req = await fetch(endpoint, {
+      method: 'PATCH',
+    });
+    if (!req.ok) {
+      throw new Error('Error: Cannot mark thread as read');
+    }
+    const response = await req.json();
+    return response as MessageThread; // If successful, this returns an updated thread
+  },
 };
