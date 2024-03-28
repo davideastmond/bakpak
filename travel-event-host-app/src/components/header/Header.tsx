@@ -68,9 +68,11 @@ export function Header() {
       );
 
       if (unreadMessages) {
+        window.document.title = 'New Message(s) - Bakpak';
         setHasMessageNotifications(true);
         return;
       }
+      window.document.title = 'Bakpak';
       setHasMessageNotifications(false);
     } catch (error: any) {
       console.error('polling error');
