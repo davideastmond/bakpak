@@ -60,6 +60,6 @@ export function SearchInputField({
         ),
       }}
       id={id}
-    ></CustomTextField>
+    />
   );
 }
