@@ -10,5 +10,5 @@ export const CategoryDict: Record<Category, string> = {
   [Category.ArtAndCulture]: 'Art And Culture',
   [Category.Games]: 'Games',
   [Category.CareerAndNetworking]: 'Career And Networking',
-  [Category.Food]: 'Food',
+  [Category.Food]: 'Food & Drink',
 };
