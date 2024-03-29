@@ -53,7 +53,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         [session.user._id]: true,
       },
     });
-    console.log(existingThread.messages);
+
     await existingThread.save();
 
     return NextResponse.json({ status: 'success', id: existingThread._id }, { status: 201 });
@@ -78,7 +78,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     },
   });
 
-  console.log(newThread.messages);
   await newThread.save();
 
   return NextResponse.json({ status: 'success', id: newThread._id }, { status: 201 });

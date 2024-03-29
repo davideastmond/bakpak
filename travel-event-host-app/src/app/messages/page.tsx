@@ -36,6 +36,7 @@ export default function MessagePage() {
   const [isNewMessage, setIsNewMessage] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chatMessage, setChatMessage] = useState<string>('');
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const [leftContainerHeaderContextMenuAnchorEl, setLeftContainerHeaderContextMenuAnchorEl] =
     useState<null | HTMLElement>(null);
@@ -70,8 +71,14 @@ export default function MessagePage() {
         fetchNewMessageUser(targetUserId as string);
       } else {
         router && router.replace('/messages');
+        setCurrentThreadContext(existingThread._id);
       }
       return;
+    }
+
+    if (firstLoad && fetchedThreadContexts.length > 0) {
+      setCurrentThreadContext(fetchedThreadContexts[0]._id);
+      setFirstLoad(false);
     }
   };
 
@@ -102,7 +109,7 @@ export default function MessagePage() {
     // If it's a new message, we need to create a new thread.
     if (isNewMessage) {
       setIsLoading(true);
-      await MessageClient.createThreadAndPostMessage({
+      const newThreadMessage = await MessageClient.createThreadAndPostMessage({
         initiator: session?.user._id as string,
         recipients: newMessageRecipients.map((recipient) => recipient._id),
         message: chatMessage,
@@ -113,6 +120,11 @@ export default function MessagePage() {
       setIsNewMessage(false);
       setIsNewMessageThreadMode(false);
       setIsLoading(false);
+
+      // When a new message is sent, set the thread context to that message
+      if (newThreadMessage) {
+        setCurrentThreadContext(newThreadMessage.id);
+      }
       return;
     }
 
