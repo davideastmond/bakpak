@@ -105,22 +105,29 @@ export function Header() {
           >
             <MenuIcon />
           </div>
-          <Box display='flex'>
-            <Box mr={1}>
-              <Image src='/images/app-logos/b_logo.png' alt='Bakpak Logo' height={30} width={20} />
+          <Link href='/'>
+            <Box display='flex'>
+              <Box mr={1} alignContent={'center'}>
+                <Image
+                  src='/images/app-logos/b_logo.png'
+                  alt='Bakpak Logo'
+                  height={30}
+                  width={20}
+                />
+              </Box>
+              <Box
+                sx={{
+                  [theme.breakpoints.down(610)]: {
+                    display: 'none',
+                  },
+                }}
+              >
+                <Typography variant='h4' color={theme.palette.primary.thirdColorIceLight}>
+                  Bakpak
+                </Typography>
+              </Box>
             </Box>
-            <Box
-              sx={{
-                [theme.breakpoints.down(610)]: {
-                  display: 'none',
-                },
-              }}
-            >
-              <Typography variant='h4' color={theme.palette.primary.thirdColorIceLight}>
-                Bakpak
-              </Typography>
-            </Box>
-          </Box>
+          </Link>
         </div>
         <div className={styles.authBox}>
           <Box>
