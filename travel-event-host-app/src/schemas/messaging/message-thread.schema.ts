@@ -22,6 +22,6 @@ const messageThreadSchema = new Schema<MessageThread>({
   messages: { type: [messageSchema], default: [] },
 });
 
-export const MessageThreadRepository =
+export const MessageThreadRepository: mongoose.Model<MessageThread> =
   mongoose.models.MessageThread ||
   mongoose.model<MessageThread>('MessageThread', messageThreadSchema);
