@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   // Create a new thread, but first check if there is already a thread between these users
   const existingThread = await MessageThreadRepository.findOne({
     originator: initiator,
-    recipients: { $all: recipients },
+    recipients: { $all: recipients, $size: recipients.length },
   });
 
   if (existingThread) {

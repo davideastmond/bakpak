@@ -66,7 +66,16 @@ export const MessageThreadCard = ({
         </Box>
         <Box>
           {/* Blurb of the last message */}
-          <Typography sx={{ color: theme.palette.primary.greyDisabled, fontWeight: 'light' }}>
+          <Typography
+            sx={{
+              color: theme.palette.primary.greyDisabled,
+              fontWeight: 'light',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {threadContext.messages[threadContext.messages.length - 1].body}
           </Typography>
         </Box>
