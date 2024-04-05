@@ -16,6 +16,7 @@ export function MessageRenderer({
 
   useEffect(() => {
     const fetchContextUsers = async () => {
+      // TODO: We could improve this by using allSettled and filtering out the rejected promises
       const users = await Promise.all(
         threadContext.recipients.map((recipient) => UserClient.getUserById(recipient)),
       );
@@ -23,10 +24,11 @@ export function MessageRenderer({
     };
 
     fetchContextUsers();
-  }, []);
+  }, [threadContext]);
 
   /*
-    This logic is responsible for rendering the messages in the message thread
+    This logic is responsible for rendering the messages with the proper horizontal alignment.
+    It will also group messages in timestamp buckets.
   */
   const render = () => {
     const messageElements: JSX.Element[] = [];

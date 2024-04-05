@@ -38,6 +38,11 @@ export default function MessagePage() {
   const [chatMessage, setChatMessage] = useState<string>('');
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
+  // This will help with the message view in mobile
+  const [responsiveMessageView, setResponsibeMessageView] = useState<'message' | 'thread'>(
+    'message',
+  );
+
   const [leftContainerHeaderContextMenuAnchorEl, setLeftContainerHeaderContextMenuAnchorEl] =
     useState<null | HTMLElement>(null);
 
@@ -56,11 +61,13 @@ export default function MessagePage() {
     const newMessageParam = searchParams.get('newMessage');
     const fetchedThreadContexts = await fetchThreadContexts();
 
-    // Even though it could be a new message, there could be a thread already existing for the user.
+    // Even though it could be a new message, there could be a thread already existing between originator and recipient
     // If one does exist, we should set the current thread context to that and switch the isMessage flag to false.
+
     const existingThread = fetchedThreadContexts.find((thread) => {
       return (
         thread.originator === session?.user._id &&
+        thread.recipients.length === 2 &&
         thread.recipients.includes(targetUserId as string)
       );
     });
@@ -107,6 +114,9 @@ export default function MessagePage() {
     // We need to send the message to the server.
     // Grab context of the thread if available.
     // If it's a new message, we need to create a new thread.
+    if (!chatMessage) return;
+    if (chatMessage.trim().length < 1) return;
+
     if (isNewMessage) {
       setIsLoading(true);
       const newThreadMessage = await MessageClient.createThreadAndPostMessage({
@@ -201,33 +211,27 @@ export default function MessagePage() {
       }}
     >
       <Box>
-        <Box
-          bgcolor={theme.palette.primary.thirdColorIceLight}
-          p={1}
-          mt={1}
-          mb={1}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              display: 'none',
-            },
-          }}
-        >
-          <ButtonBase>
-            <Box display='flex'>
-              <ArrowBackIcon sx={{ color: theme.palette.primary.charcoal, alignSelf: 'center' }} />
-              <Typography
-                sx={{
-                  color: theme.palette.primary.charcoal,
-                  fontWeight: 'bold',
-                  fontSize: '0.8rem',
-                  ml: 1,
-                }}
-              >
-                Back to messages
-              </Typography>
-            </Box>
-          </ButtonBase>
-        </Box>
+        {/* Back to messages button */}
+        {responsiveMessageView === 'message' && (
+          <Box
+            bgcolor={theme.palette.primary.thirdColorIceLight}
+            p={1}
+            mt={1}
+            mb={1}
+            sx={{
+              [theme.breakpoints.up('md')]: {
+                display: 'none',
+              },
+            }}
+          >
+            <BackToMessagesButton
+              onClick={() => {
+                setResponsibeMessageView('thread');
+                setCurrentThreadContext(null);
+              }}
+            />
+          </Box>
+        )}
 
         <Box id='mainContainer' display='flex' gap={3}>
           <Box
@@ -237,7 +241,7 @@ export default function MessagePage() {
             minWidth={'500px'}
             sx={{
               [theme.breakpoints.down('md')]: {
-                display: 'none',
+                display: responsiveMessageView === 'message' ? 'none' : 'block',
               },
             }}
           >
@@ -342,6 +346,9 @@ export default function MessagePage() {
               [theme.breakpoints.up('md')]: {
                 maxWidth: '900px',
                 borderRadius: '2%',
+              },
+              [theme.breakpoints.down('md')]: {
+                display: responsiveMessageView === 'message' ? 'block' : 'none',
               },
             }}
           >
@@ -456,3 +463,23 @@ export default function MessagePage() {
     </Box>
   );
 }
+
+const BackToMessagesButton = ({ onClick }: { onClick?: () => void }) => {
+  return (
+    <ButtonBase onClick={onClick}>
+      <Box display='flex'>
+        <ArrowBackIcon sx={{ color: theme.palette.primary.charcoal, alignSelf: 'center' }} />
+        <Typography
+          sx={{
+            color: theme.palette.primary.charcoal,
+            fontWeight: 'bold',
+            fontSize: '0.8rem',
+            ml: 1,
+          }}
+        >
+          Back to messages
+        </Typography>
+      </Box>
+    </ButtonBase>
+  );
+};

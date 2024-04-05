@@ -56,6 +56,7 @@
 }
 .avatarBox {
   margin-left: 1rem;
+  margin-top: 5px;
   align-self: normal;
 }
 .loaderSkeleton {
