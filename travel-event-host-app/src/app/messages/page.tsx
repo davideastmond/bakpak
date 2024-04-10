@@ -39,7 +39,7 @@ export default function MessagePage() {
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   // This will help with the message view in mobile
-  const [responsiveMessageView, setResponsibeMessageView] = useState<'message' | 'thread'>(
+  const [responsiveMessageView, setResponsiveMessageView] = useState<'message' | 'thread'>(
     'message',
   );
 
@@ -152,21 +152,22 @@ export default function MessagePage() {
 
   const handleDeleteThreadInContext = async () => {
     if (!currentThreadContext) return;
+  
     setIsLoading(true);
+
     await MessageClient.patchDeleteRecipientFromThread(currentThreadContext);
     await fetchThreadContexts();
 
     // When a context is deleted, we should reset the current context
     setCurrentThreadContext(null);
-
     setIsLoading(false);
-
     setLeftContainerHeaderContextMenuAnchorEl(null);
   };
 
   const handleCancelNewMessage = () => {
     setIsNewMessageThreadMode(false);
     setCurrentThreadContext(null);
+
     // Clear the new
     setNewMessageRecipients([]);
     setIsNewMessage(false);
@@ -195,6 +196,10 @@ export default function MessagePage() {
     setCurrentThreadContext(threadId);
     setIsNewMessageThreadMode(false);
     setNewMessageRecipients([]);
+
+    // For mobile mode, we can set a toggle to indicate that when user clicks
+    // the threadCard, switch to 'message mode'
+    setResponsiveMessageView('message');
   };
 
   if (status === AuthStatus.Unauthenticated) {
@@ -226,7 +231,7 @@ export default function MessagePage() {
           >
             <BackToMessagesButton
               onClick={() => {
-                setResponsibeMessageView('thread');
+                setResponsiveMessageView('thread');
                 setCurrentThreadContext(null);
               }}
             />

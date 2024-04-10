@@ -52,6 +52,10 @@ export async function PATCH(_: NextRequest, { params }: { params: { id: string }
   /* The philosophy of message threads when some user wants to delete it on the client side 
     is to delete the requesting user from the recipients list (instead of deleting the whole thread)
   */
+
+  // TODO: We can push a "user left thread" message to the thread stream
+  // Because users who have left will not be associated with the thread anymore
+  // and their avatar data will not be available to the thread
   const { id } = params;
   if (!isValidMongoId(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
