@@ -79,7 +79,7 @@ export const MessageThreadCard = ({
             {threadContext.messages[threadContext.messages.length - 1].body}
           </Typography>
         </Box>
-        {threadHasUnreadMessages(threadContext, baseUser._id!) && (
+        {threadHasUnreadMessages(threadContext, baseUser?._id!) && (
           <Box className='unread-message-indicator' display='flex' justifyContent={'right'}>
             <Box className={styles.newDot} />
           </Box>

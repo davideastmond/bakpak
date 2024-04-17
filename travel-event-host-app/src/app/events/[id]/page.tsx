@@ -253,9 +253,11 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                   fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
                   color={theme.palette.primary.charcoal}
                 >
-                  <Suspense fallback={<Spinner />}>
-                    {`${eventHost?.firstName} ${eventHost?.lastName}`}
-                  </Suspense>
+                  {isLoading ? (
+                    <Spinner />
+                  ) : (
+                    `${eventHost?.firstName || ''} ${eventHost?.lastName || ''}`
+                  )}
                 </Typography>
               </Box>
             </Box>

@@ -21,7 +21,7 @@ import {
 import { MessageRenderer } from '@/components/messaging/message-renderer/MessageRenderer';
 import { NewConversationHeader } from '@/components/messaging/new-conversation-header/NewConversationHeader';
 import { AuthStatus } from '@/lib/auth-status';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { MessageClient } from '../clients/message/message-client';
 import { UserClient } from '../clients/user/user-client';
 import theme from '../theme';
@@ -37,6 +37,8 @@ export default function MessagePage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chatMessage, setChatMessage] = useState<string>('');
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+
+  const sRef = useRef<HTMLDivElement>(null);
 
   // This will help with the message view in mobile
   const [responsiveMessageView, setResponsiveMessageView] = useState<'message' | 'thread'>(
@@ -86,6 +88,7 @@ export default function MessagePage() {
     if (firstLoad && fetchedThreadContexts.length > 0) {
       setCurrentThreadContext(fetchedThreadContexts[0]._id);
       setFirstLoad(false);
+      scrollToBottom();
     }
   };
 
@@ -110,7 +113,8 @@ export default function MessagePage() {
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e: any) => {
+    e.preventDefault();
     // We need to send the message to the server.
     // Grab context of the thread if available.
     // If it's a new message, we need to create a new thread.
@@ -135,6 +139,7 @@ export default function MessagePage() {
       if (newThreadMessage) {
         setCurrentThreadContext(newThreadMessage.id);
       }
+      scrollToBottom();
       return;
     }
 
@@ -147,12 +152,13 @@ export default function MessagePage() {
     });
     setChatMessage('');
     await fetchThreadContexts();
+    scrollToBottom();
     setIsLoading(false);
   };
 
   const handleDeleteThreadInContext = async () => {
     if (!currentThreadContext) return;
-  
+
     setIsLoading(true);
 
     await MessageClient.patchDeleteRecipientFromThread(currentThreadContext);
@@ -202,6 +208,13 @@ export default function MessagePage() {
     setResponsiveMessageView('message');
   };
 
+  const scrollToBottom = () => {
+    console.info('scrolling to bottom');
+    if (sRef.current) {
+      sRef.current.scrollTop = sRef.current.scrollHeight;
+    }
+  };
+
   if (status === AuthStatus.Unauthenticated) {
     return router.replace('/auth/signin');
   }
@@ -242,8 +255,8 @@ export default function MessagePage() {
           <Box
             id='left-container-main'
             height='calc(calc(var(--pvh, 1vh)* 100) - 112px);'
-            width={'500px'}
-            minWidth={'500px'}
+            maxWidth={'900px'}
+            width={'100%'}
             sx={{
               [theme.breakpoints.down('md')]: {
                 display: responsiveMessageView === 'message' ? 'none' : 'block',
@@ -402,9 +415,10 @@ export default function MessagePage() {
             </Box>
             <Box
               id='right-message-parent-container'
+              ref={sRef}
               sx={{
                 overflowY: 'auto',
-                maxHeight: '58vh',
+                maxHeight: '50vh',
               }}
             >
               <Box
@@ -412,7 +426,7 @@ export default function MessagePage() {
                 display={'flex'}
                 flexDirection={'column'}
                 justifyContent={'flex-end'}
-                minHeight={'58vh'}
+                height={'60vh'}
               >
                 {/* This is the space for the messages */}
                 {currentThreadContext && session && (
@@ -436,7 +450,7 @@ export default function MessagePage() {
                   inputProps={{
                     maxLength: 500,
                   }}
-                  maxRows={4}
+                  maxRows={3}
                   placeholder='Send a message'
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
