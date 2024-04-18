@@ -44,14 +44,17 @@ export default function UpcomingEventsPage() {
           4,
         );
 
-        setUpcomingEvents([...upcomingEvents, ...fetchedUpcomingEvents.events]);
+        const { events } = fetchedUpcomingEvents;
+        setUpcomingEvents([...upcomingEvents, ...events]);
         return;
       }
+
       setTitle(`Upcoming ${CategoryDict[category as Category]} events`);
       const fetchedUpcomingEvents = await EventClient.getEventsBySearchQuery({
         categories: [category as Category],
         page: pageNumber,
         pageSize: 4,
+        timeline: EventTimeLine.Upcoming,
       });
       setUpcomingEvents([...upcomingEvents, ...fetchedUpcomingEvents]);
       return;
