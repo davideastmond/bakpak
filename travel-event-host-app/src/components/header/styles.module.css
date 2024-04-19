@@ -1,9 +1,11 @@
 .navMain {
-  margin-top: 5px;
+  margin-top: 10px;
 }
 .header {
   position: sticky;
-  padding: 1.5em;
+  /* padding: 1.5em; */
+  padding-left: 1rem;
+  padding-right: 1rem;
   width: 100%;
   background-color: var(--secondary-color-dark-black);
   top: 0;
@@ -54,6 +56,7 @@
 }
 .avatarBox {
   margin-left: 1rem;
+  margin-top: 5px;
   align-self: normal;
 }
 .loaderSkeleton {
@@ -148,4 +151,15 @@
   .avatarBox {
     align-self: center;
   }
+}
+
+.messageNotificationDot {
+  position: relative;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  top: 24px;
+  left: 27px;
+  background-color: red;
+  z-index: 2;
 }

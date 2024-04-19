@@ -4,18 +4,20 @@ import { UserClient } from '@/app/clients/user/user-client';
 import { getLocationPostDataFromGeocoderResult } from '@/app/integration/google-maps-api/address-helper';
 import { GoogleMapsTimezoneData } from '@/app/integration/google-maps-api/timezone-requestor';
 import theme from '@/app/theme';
+import { CommonButton } from '@/components/common-button/Common-Button';
 import { EventsSection } from '@/components/events-section/Events-section';
 import { ProfileEditor } from '@/components/profile-editor/ProfileEditor';
 import { Spinner } from '@/components/spinner/Spinner';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
 import { AuthStatus } from '@/lib/auth-status';
+import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { UserEvent } from '@/models/user-event';
 import { EventTimeLine } from '@/types/event-timeline';
 import { SecureUser } from '@/types/secure-user';
 import { Alert, Backdrop, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 interface UserPortalPageProps {
   params: {
@@ -61,6 +63,9 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
   }, [pastEventsPageNumber]);
 
   const fetchUser = async (showLoading: boolean = true) => {
+    if (!isValidMongoId(id)) {
+      router.push('/');
+    }
     try {
       showLoading && setIsLoading(true);
       const fetchedUser = await UserClient.getUserById(id);
@@ -199,6 +204,21 @@ export default function UserPortalPage({ params: { id } }: UserPortalPageProps) 
             />
           )}
         </Box>
+        {session?.user?._id !== id && (
+          <Suspense fallback={<Spinner />}>
+            <Box mt={3} display='flex' justifyContent={'center'} ml={2}>
+              {/* Hot pink chat button */}
+              <CommonButton
+                onButtonClick={() => router.push(`/messages?target=${id}&newMessage=true`)}
+                label={`Chat with ${user?.firstName}`}
+                backgroundColor={theme.palette.primary.sexyHotPink}
+                borderColor={theme.palette.primary.sexyHotPink}
+                textColor={theme.palette.primary.thirdColorIceLight}
+                borderRadius={2}
+              />
+            </Box>
+          </Suspense>
+        )}
       </Box>
       <Box
         mt={3}

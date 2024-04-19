@@ -42,6 +42,7 @@ export const UserClient = {
       throw new Error('Error: Cannot patch user profile');
     }
   },
+
   patchUserLocationById: async (userId: string, locationData: LocationData): Promise<void> => {
     const endPoint: string = `/api/users/${userId}/location`;
     const req = await fetch(endPoint, {
@@ -55,6 +56,18 @@ export const UserClient = {
     if (!req.ok) {
       throw new Error('Error: Cannot patch user location');
     }
+  },
+
+  getUsersBySearchQuery: async (searchQuery: string): Promise<SecureUser[]> => {
+    const endPoint: string = `/api/users/search?query=${searchQuery}`;
+    const req = await fetch(endPoint);
+
+    if (!req.ok) {
+      throw new Error('Error: Cannot fetch users');
+    }
+
+    const response = await req.json();
+    return response as SecureUser[];
   },
 };
 

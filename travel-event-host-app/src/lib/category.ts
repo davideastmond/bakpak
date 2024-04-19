@@ -8,4 +8,5 @@ export enum Category {
   ArtAndCulture = 'artandCulture',
   Games = 'games',
   CareerAndNetworking = 'careerAndNetworking',
+  Food = 'food',
 }

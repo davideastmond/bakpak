@@ -1,12 +1,12 @@
+import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { locationUpdateValidationSchema } from '@/lib/yup-validators/profile-update/location-update/location-update-validator';
 import { UserRepository } from '@/schemas/user';
-import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
 
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!isValidMongoId(id))
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
 
   // Validate the request body

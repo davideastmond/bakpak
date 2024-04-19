@@ -1,4 +1,5 @@
 import { LocationData } from './location';
+import { BlockedUser } from './messaging/blocked-user.model';
 
 export interface User {
   _id: string;
@@ -10,4 +11,5 @@ export interface User {
   bio?: string;
   location?: LocationData;
   isAdmin?: boolean;
+  blockedUsers?: Array<BlockedUser>;
 }

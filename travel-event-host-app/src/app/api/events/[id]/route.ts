@@ -1,20 +1,19 @@
 import { connectMongoDB } from '@/lib/mongodb';
+import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import {
   eventCreateValidationSchema,
   eventLocationRouteValidationSchema,
 } from '@/lib/yup-validators/event/event-create-validation.schema';
 import { EventRepository } from '@/schemas/user-event';
 import dayjs from 'dayjs';
-import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
 
   await connectMongoDB();
-  const isValidObjectId = mongoose.Types.ObjectId.isValid(id);
 
-  if (!isValidObjectId) {
+  if (!isValidMongoId(id)) {
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
   }
 
@@ -27,8 +26,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { id } = params;
 
   await connectMongoDB();
-  const isValidObjectId = mongoose.Types.ObjectId.isValid(id);
-  if (!isValidObjectId) {
+
+  if (!isValidMongoId(id)) {
     return NextResponse.json({ message: 'Invalid ObjectId format' }, { status: 400 });
   }
 

@@ -73,7 +73,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
 
   useEffect(() => {
     fetchEvent();
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     const runMapLoader = async () => {
@@ -253,7 +253,11 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                   fontSize={['1rem', '1rem', '1.3rem', '1.6rem', '1.8rem']}
                   color={theme.palette.primary.charcoal}
                 >
-                  {`${eventHost?.firstName} ${eventHost?.lastName}`}
+                  {isLoading ? (
+                    <Spinner />
+                  ) : (
+                    `${eventHost?.firstName || ''} ${eventHost?.lastName || ''}`
+                  )}
                 </Typography>
               </Box>
             </Box>
