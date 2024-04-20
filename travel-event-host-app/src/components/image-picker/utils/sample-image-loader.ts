@@ -1,6 +1,10 @@
 import React from 'react';
 
 const MAX_FILE_SIZE: number = 2097152;
+
+/**
+ * SampleImageLoader is a utility object that provides a method to load an image file
+ */
 export const SampleImageLoader = {
   load: (
     e: React.ChangeEvent<HTMLInputElement>,
