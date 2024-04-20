@@ -25,7 +25,7 @@ import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { AddressAutocomplete } from '../address-autocomplete/AddressAutocomplete';
 import { CalendarPicker } from '../calendar-picker/CalendarPicker';
 import { CheckboxGroup } from '../checkbox-group/CheckboxGroup';
-import { generateInitialCheckboxStateFromArray } from '../checkbox-group/utils/generate-initial-checkbox-state';
+import { generateInitialCheckboxStateFromArray } from '../checkbox-group/utils/checkbox-state-utils';
 import { getCheckedElements } from '../checkbox-group/utils/get-checked-elements';
 import { CommonButton } from '../common-button/Common-Button';
 import { CustomTextField, StyledFormFieldSection } from '../custom-fields/CustomFields';

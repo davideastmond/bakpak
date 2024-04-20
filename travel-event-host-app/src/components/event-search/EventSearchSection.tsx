@@ -14,7 +14,7 @@ import { Category } from '@/lib/category';
 import {
   generateInitialCheckboxState,
   loadCheckboxStateFromLocalStorage,
-} from '../checkbox-group/utils/generate-initial-checkbox-state';
+} from '../checkbox-group/utils/checkbox-state-utils';
 import { getCheckedElements } from '../checkbox-group/utils/get-checked-elements';
 import { Spinner } from '../spinner/Spinner';
 import { EventSearchFilterBox } from './event-search-filter-box/EventSearchFilterBox';
