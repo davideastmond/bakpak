@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "cd .. && husky install travel-event-host-app/.husky",
-    "test": "jest",
+    "test": "clear && jest",
     "test:watch": "jest --watch"
   },
   "dependencies": {
@@ -48,6 +48,7 @@
     "husky": "^8.0.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
     "lint-staged": "^15.2.0",
     "postcss": "^8",
     "prettier": "^3.2.2",
@@ -63,5 +64,4 @@
       "prettier --write --ignore-unknown"
     ]
   }
-  
 }
