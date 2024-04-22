@@ -1,7 +1,7 @@
 import { SampleImageLoader } from './sample-image-loader';
 
 describe('sample-image-loader', () => {
-  it('should load an image file', () => {
+  it('should load an image file', async () => {
     // Arrange
     const e = {
       target: {
@@ -30,7 +30,7 @@ describe('sample-image-loader', () => {
     expect(fileReader.readAsDataURL).toHaveBeenCalledWith(e.target.files[0]);
   });
 
-  it('should throw an error when the file is not an image', () => {
+  it('should throw an error when the file is not an image', async () => {
     // Arrange
     const e = {
       target: {
