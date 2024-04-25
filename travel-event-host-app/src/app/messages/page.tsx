@@ -11,7 +11,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, ButtonBase, Divider, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import {
+  Backdrop,
+  Box,
+  ButtonBase,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
@@ -228,6 +237,9 @@ export default function MessagePage() {
         },
       }}
     >
+      <Backdrop open={isLoading}>
+        <Spinner />
+      </Backdrop>
       <Box>
         {/* Back to messages button */}
         {responsiveMessageView === 'message' && (
@@ -311,7 +323,7 @@ export default function MessagePage() {
                   onClose={() => setLeftContainerHeaderContextMenuAnchorEl(null)}
                 >
                   <MenuItem
-                    disabled={Boolean(currentThreadContext === null)}
+                    disabled={Boolean(isLoading || currentThreadContext === null)}
                     onClick={handleDeleteThreadInContext} // Here we send request to API to delete a threadContext
                   >
                     Delete Thread

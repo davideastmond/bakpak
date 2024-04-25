@@ -26,9 +26,9 @@ describe('user-scopes-validator', () => {
     // Assert
     expect(result).toBe(false);
   });
-  test('validation should pass when scopes is empty', async () => {
+  test('validation should pass when scopes is undefined', async () => {
     // Arrange
-    const scopes: string[] = [];
+    const scopes = undefined;
     // Act
     const result = await userScopesValidator.isValid(scopes);
     // Assert

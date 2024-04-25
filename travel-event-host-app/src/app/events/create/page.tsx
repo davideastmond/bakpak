@@ -18,7 +18,8 @@ import { ErrorComponent } from '@/components/ErrorComponent/ErrorComponent';
 import { AddressAutocomplete } from '@/components/address-autocomplete/AddressAutocomplete';
 import { CalendarPicker } from '@/components/calendar-picker/CalendarPicker';
 import { CheckboxGroup } from '@/components/checkbox-group/CheckboxGroup';
-import { generateInitialCheckboxState } from '@/components/checkbox-group/utils/generate-initial-checkbox-state';
+
+import { generateInitialCheckboxState } from '@/components/checkbox-group/utils/checkbox-state-utils';
 import { getCheckedElements } from '@/components/checkbox-group/utils/get-checked-elements';
 import { CommonButton } from '@/components/common-button/Common-Button';
 import { CustomTextField, StyledFormFieldSection } from '@/components/custom-fields/CustomFields';
