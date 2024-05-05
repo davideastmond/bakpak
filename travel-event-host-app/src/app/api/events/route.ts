@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   const results = await EventRepository.aggregate(pipeline);
 
   return NextResponse.json(
-    { totalCount: results[0].metadata[0].totalCount, events: results[0].data },
+    { totalCount: results[0].metadata[0]?.totalCount || 0, events: results[0].data },
     { status: 200 },
   );
 }

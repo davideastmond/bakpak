@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
 
   if (allEvents[0].data.length > 0) {
     return NextResponse.json(
-      { totalCount: allEvents[0].metadata[0].totalCount, events: allEvents[0].data },
+      { totalCount: allEvents[0].metadata[0]?.totalCount || 0, events: allEvents[0].data },
       { status: 200 },
     );
   }
