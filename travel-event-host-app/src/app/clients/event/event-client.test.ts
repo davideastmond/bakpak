@@ -87,6 +87,22 @@ describe('event client tests', () => {
       // Assert
       expect(mockFetch).toHaveBeenCalledWith(`/api/users/userId/events?&timeline=all&`);
     });
+    test('calls the correct endpoint with page and pageSize', async () => {
+      // Arrange
+      const mockFetch = jest
+        .fn()
+        .mockImplementationOnce(() =>
+          Promise.resolve({ ok: true, json: () => Promise.resolve({}) }),
+        );
+      global.fetch = mockFetch;
+      const userId = 'userId';
+      // Act
+      await EventClient.getEventsByUserId(userId, EventTimeLine.Upcoming, 1, 10);
+      // Assert
+      expect(mockFetch).toHaveBeenCalledWith(
+        `/api/users/userId/events?&timeline=upcoming&page=1&pageSize=10`,
+      );
+    });
     test('throws error properly when fetch fails', async () => {
       // Arrange
       global.fetch = jest.fn().mockImplementationOnce(() => Promise.resolve({ ok: false }));
@@ -111,6 +127,19 @@ describe('event client tests', () => {
       // Assert
       expect(mockFetch).toHaveBeenCalledWith(`/api/events?timeline=all&`);
     });
+    test('url is formed with the correct page and pageSize params', async () => {
+      // Arrange
+      const mockFetch = jest
+        .fn()
+        .mockImplementationOnce(() =>
+          Promise.resolve({ ok: true, json: () => Promise.resolve({}) }),
+        );
+      global.fetch = mockFetch;
+      // Act
+      await EventClient.getAllEvents(EventTimeLine.Past, 1, 10);
+      // Assert
+      expect(mockFetch).toHaveBeenCalledWith(`/api/events?timeline=past&page=1&pageSize=10`);
+    });
     test('error is extracted and returned', async () => {
       global.fetch = jest.fn().mockImplementationOnce(() =>
         Promise.resolve({
@@ -123,6 +152,16 @@ describe('event client tests', () => {
         }),
       );
       await expect(EventClient.getAllEvents(undefined)).rejects.toThrow('false error');
+    });
+    test('error is thrown when fetch fails', async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() =>
+          Promise.resolve({ ok: false, json: () => Promise.resolve({}) }),
+        );
+      await expect(EventClient.getAllEvents(undefined)).rejects.toThrow(
+        'Error: Cannot fetch events',
+      );
     });
   });
   describe('event registration/unregistration', () => {
