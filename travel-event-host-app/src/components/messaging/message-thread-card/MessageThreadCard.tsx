@@ -5,7 +5,7 @@ import { MessageThread } from '@/models/messaging/message-thread.model';
 import { SecureUser } from '@/types/secure-user';
 import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { BaseCard } from '../base-card/BaseCard';
+import { BaseMessageCard } from '../base-message-card/Base-message-card';
 import { SummarySectionMenuActions } from '../summary-section/SummarySection';
 import { threadHasUnreadMessages } from '../utils/unread-message';
 import styles from './styles.module.css';
@@ -47,7 +47,7 @@ export const MessageThreadCard = ({
   };
 
   return (
-    <BaseCard
+    <BaseMessageCard
       users={recipients}
       backgroundColor={selected ? theme.palette.primary.aliceBlue : 'white'}
       onCardClicked={handleOnCardClicked}
@@ -85,7 +85,7 @@ export const MessageThreadCard = ({
           </Box>
         )}
       </Box>
-    </BaseCard>
+    </BaseMessageCard>
   );
 };
 

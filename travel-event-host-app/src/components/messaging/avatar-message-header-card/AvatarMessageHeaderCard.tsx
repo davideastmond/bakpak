@@ -5,7 +5,7 @@ import { SecureUser } from '@/types/secure-user';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { BaseCard } from '../base-card/BaseCard';
+import { BaseMessageCard } from '../base-message-card/Base-message-card';
 import { SummarySection } from '../summary-section/SummarySection';
 
 export const AvatarMessageHeaderCard = ({
@@ -20,7 +20,7 @@ export const AvatarMessageHeaderCard = ({
   onRemoveIconClick?: (userId: string) => void;
 }) => {
   return (
-    <BaseCard users={user}>
+    <BaseMessageCard users={user}>
       <Box ml={2} width='100%'>
         <Box>
           {/* TODO: This needs to be styled differently if it's a thread info */}
@@ -48,7 +48,7 @@ export const AvatarMessageHeaderCard = ({
           </IconButton>
         </Box>
       ) : null}
-    </BaseCard>
+    </BaseMessageCard>
   );
 };
 

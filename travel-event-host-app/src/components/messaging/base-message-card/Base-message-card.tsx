@@ -5,7 +5,7 @@ import { SecureUser } from '@/types/secure-user';
 import { Avatar, Box } from '@mui/material';
 import styles from '../styles/styles.module.css';
 
-export const BaseCard = ({
+export const BaseMessageCard = ({
   users,
   children,
   backgroundColor,
