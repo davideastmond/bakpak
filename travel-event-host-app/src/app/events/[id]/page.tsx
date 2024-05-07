@@ -470,20 +470,21 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                   >
                     {getAttendEventButtonLabel(userEvent!)}
                   </Alert>
-
-                  <CommonButton
-                    label='Unregister from event'
-                    variant='text'
-                    textColor={theme.palette.primary.burntOrangeCancelError}
-                    baseButtonStyles={{
-                      width: '100%',
-                      textDecoration: 'underline',
-                      fontSize: ['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem'],
-                    }}
-                    startIcon={<NotInterestedIcon />}
-                    onButtonClick={handleUnregisterButtonClicked}
-                    disabled={isLoading || (userEvent && isEventInPast(userEvent))}
-                  />
+                  {!isEventInPast(userEvent!) && (
+                    <CommonButton
+                      label='Unregister from event'
+                      variant='text'
+                      textColor={theme.palette.primary.burntOrangeCancelError}
+                      baseButtonStyles={{
+                        width: '100%',
+                        textDecoration: 'underline',
+                        fontSize: ['0.8rem', '0.8rem', '1rem', '1.2rem', '1.4rem'],
+                      }}
+                      startIcon={<NotInterestedIcon />}
+                      onButtonClick={handleUnregisterButtonClicked}
+                      disabled={isLoading || (userEvent && isEventInPast(userEvent))}
+                    />
+                  )}
                 </>
               )}
               {status === AuthStatus.Authenticated && isSessionUserEventHost() && (
