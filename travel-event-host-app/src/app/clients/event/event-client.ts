@@ -1,6 +1,6 @@
-import { Category } from '@/lib/category';
+import { Category } from '@/lib/definitions/category';
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { UserEvent } from '@/models/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
 
 export interface GetAllEventsAPIResponse {
   events: UserEvent[];

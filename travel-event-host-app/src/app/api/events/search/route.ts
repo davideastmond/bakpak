@@ -1,6 +1,7 @@
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { connectMongoDB } from '@/lib/mongodb';
 import { EventRepository } from '@/schemas/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {

@@ -28,9 +28,10 @@ import { SampleImageLoader } from '@/components/image-picker/utils/sample-image-
 import { Spinner } from '@/components/spinner/Spinner';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
-import { AuthStatus } from '@/lib/auth-status';
-import { Category } from '@/lib/category';
-import { CategoryDict } from '@/lib/category-dictionary';
+
+import { AuthStatus } from '@/lib/definitions/auth-status';
+import { Category } from '@/lib/definitions/category';
+import { CategoryDict } from '@/lib/definitions/category-dictionary';
 import {
   eventCreateValidationSchema,
   eventCreationCategoriesSchema,

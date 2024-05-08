@@ -1,7 +1,8 @@
 import { UserClient } from '@/app/clients/user/user-client';
 import theme from '@/app/theme';
 import { MessageThread } from '@/models/messaging/message-thread.model';
-import { SecureUser } from '@/types/secure-user';
+
+import { SecureUser } from '@/lib/definitions/secure-user';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';

@@ -7,9 +7,9 @@ import {
   TimezoneRequestor,
 } from '@/app/integration/google-maps-api/timezone-requestor';
 import { ImageType, SpacesImageInteractor } from '@/app/integration/utils/spaces-image-interactor';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-update/profile-update-validator';
 import { extractValidationErrors } from '@/lib/yup-validators/utils/extract-validation-errors';
-import { SecureUser } from '@/types/secure-user';
 import { Box, Button, Typography } from '@mui/material';
 import { Suspense, useState } from 'react';
 import avatarStyles from '../../app/common-styles/avatar-styles.module.css';

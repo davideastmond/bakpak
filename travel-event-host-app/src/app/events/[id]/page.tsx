@@ -13,11 +13,14 @@ import { Spinner } from '@/components/spinner/Spinner';
 import UserListContainer from '@/components/user-list-container/UserListContainer';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
-import { AuthStatus } from '@/lib/auth-status';
-import { CategoryDict } from '@/lib/category-dictionary';
+
 import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
 import { UserEvent } from '@/models/user-event';
-import { SecureUser } from '@/types/secure-user';
+
+import { AuthStatus } from '@/lib/definitions/auth-status';
+import { Category } from '@/lib/definitions/category';
+import { CategoryDict } from '@/lib/definitions/category-dictionary';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Loader } from '@googlemaps/js-api-loader';
 import { DeleteForever } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -408,7 +411,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
                   sx={{ whiteSpace: 'pre-line' }}
                   key={`${index}_${category}`}
                 >
-                  {CategoryDict[category]}
+                  {CategoryDict[category as Category]}
                 </Typography>
               ))}
             </Box>

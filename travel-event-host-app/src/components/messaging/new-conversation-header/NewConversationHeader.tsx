@@ -1,7 +1,7 @@
 import { UserClient } from '@/app/clients/user/user-client';
 import theme from '@/app/theme';
 import { SearchInputField } from '@/components/event-search/search-input-field/SearchInputField';
-import { SecureUser } from '@/types/secure-user';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Box, ButtonBase, ClickAwayListener, Typography } from '@mui/material';
 import { useState } from 'react';
 import { UserSearchResultDropdown } from '../user-search-result-dropdown/UserSearchResultDropDown';

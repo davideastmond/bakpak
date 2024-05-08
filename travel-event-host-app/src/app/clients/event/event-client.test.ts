@@ -1,4 +1,4 @@
-import { EventTimeLine } from '@/types/event-timeline';
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { EventClient } from './event-client';
 
 describe('event client tests', () => {

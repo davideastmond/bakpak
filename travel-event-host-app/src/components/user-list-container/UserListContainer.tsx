@@ -1,5 +1,5 @@
 import theme from '@/app/theme';
-import { SecureUser } from '@/types/secure-user';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import avatarStyles from '../../app/common-styles/avatar-styles.module.css';

@@ -6,7 +6,6 @@ import { Spinner } from '@/components/spinner/Spinner';
 import { useAuthContext } from '@/lib/auth-context';
 import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { MessageThread } from '@/models/messaging/message-thread.model';
-import { SecureUser } from '@/types/secure-user';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
@@ -29,7 +28,9 @@ import {
 } from '@/components/messaging/avatar-message-header-card/AvatarMessageHeaderCard';
 import { MessageRenderer } from '@/components/messaging/message-renderer/MessageRenderer';
 import { NewConversationHeader } from '@/components/messaging/new-conversation-header/NewConversationHeader';
-import { AuthStatus } from '@/lib/auth-status';
+
+import { AuthStatus } from '@/lib/definitions/auth-status';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { MessageClient } from '../clients/message/message-client';
 import { UserClient } from '../clients/user/user-client';

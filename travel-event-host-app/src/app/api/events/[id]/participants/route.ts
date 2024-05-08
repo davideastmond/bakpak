@@ -1,10 +1,11 @@
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { connectMongoDB } from '@/lib/mongodb';
 import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { UserEvent } from '@/models/user-event';
 
 import { UserRepository } from '@/schemas/user';
 import { EventRepository } from '@/schemas/user-event';
-import { SecureUser } from '@/types/secure-user';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 // Fetch the users associated with the event

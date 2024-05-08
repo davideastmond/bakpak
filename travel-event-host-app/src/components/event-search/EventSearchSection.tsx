@@ -10,7 +10,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { EventCard } from '../event/event-card/Event-card';
 
 import { IAppActionType, useAppContext } from '@/lib/app-context';
-import { Category } from '@/lib/category';
+
+import { Category } from '@/lib/definitions/category';
 import {
   generateInitialCheckboxState,
   loadCheckboxStateFromLocalStorage,

@@ -1,7 +1,8 @@
 import theme from '@/app/theme';
 import { MultiAvatarComponent } from '@/components/avatar/multi-avatar/MultiAvatar';
 import UserAvatar from '@/components/avatar/user-avatar/UserAvatar';
-import { SecureUser } from '@/types/secure-user';
+
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Avatar, Box } from '@mui/material';
 import styles from '../styles/styles.module.css';
 

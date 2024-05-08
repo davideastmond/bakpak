@@ -1,5 +1,5 @@
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { LocationData } from '@/models/location';
-import { SecureUser } from '@/types/secure-user';
 
 export const UserClient = {
   getUserById: async (userId: string, scopes?: string[]): Promise<SecureUser | undefined> => {

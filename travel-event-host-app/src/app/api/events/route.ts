@@ -1,8 +1,8 @@
 import { connectMongoDB } from '@/lib/mongodb';
 import { UserEvent } from '@/models/user-event';
 import { EventRepository } from '@/schemas/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
 
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import {

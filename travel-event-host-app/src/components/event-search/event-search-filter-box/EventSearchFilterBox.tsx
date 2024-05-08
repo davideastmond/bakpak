@@ -1,7 +1,8 @@
 'use client';
 
 import { CheckboxGroup } from '@/components/checkbox-group/CheckboxGroup';
-import { CategoryDict } from '@/lib/category-dictionary';
+
+import { CategoryDict } from '@/lib/definitions/category-dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, MenuItem, Select, Typography } from '@mui/material';
 import { useState } from 'react';
