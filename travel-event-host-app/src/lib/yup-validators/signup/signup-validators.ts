@@ -30,7 +30,7 @@ export const signUpValidationSchema = object({
       return /[\p{Letter}\s]+/gu.test(value);
     }),
   location: object({
-    address_components: array().required('Address components  missing'),
+    address_components: array().required('Address components missing'),
     formatted_address: string().required('Formatted address missing'),
     geometry: object({}).required('geoloc information missing'),
     place_id: string().required('place id missing'),
