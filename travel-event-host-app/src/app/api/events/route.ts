@@ -1,8 +1,8 @@
 import { connectMongoDB } from '@/lib/mongodb';
 import { UserEvent } from '@/models/user-event';
 import { EventRepository } from '@/schemas/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
 
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import {
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   const results = await EventRepository.aggregate(pipeline);
 
   return NextResponse.json(
-    { totalCount: results[0].metadata[0].totalCount, events: results[0].data },
+    { totalCount: results[0].metadata[0]?.totalCount || 0, events: results[0].data },
     { status: 200 },
   );
 }

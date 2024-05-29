@@ -9,6 +9,10 @@ export function generateInitialCheckboxState(fromObject: Object): { [key in stri
   return state;
 }
 
+/**
+ * Retrieves the checkbox state from local storage so it can be rendered in the UI
+ * @returns
+ */
 export function loadCheckboxStateFromLocalStorage(): { [key in string]: boolean } | null {
   const state = localStorage.getItem('categoryCheckboxState');
   if (state) return JSON.parse(state);

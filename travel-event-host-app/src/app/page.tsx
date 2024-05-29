@@ -6,9 +6,11 @@ import { HeroSection } from '@/components/hero/Hero-Section';
 import { Spinner } from '@/components/spinner/Spinner';
 import { IAppActionType, useAppContext } from '@/lib/app-context';
 import { useAuthContext } from '@/lib/auth-context';
-import { AuthStatus } from '@/lib/auth-status';
+
+import { AuthStatus } from '@/lib/definitions/auth-status';
 import { UserEvent } from '@/models/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
+
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { Backdrop, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';

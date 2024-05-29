@@ -1,4 +1,4 @@
-import { Category } from '@/lib/category';
+import { Category } from '@/lib/definitions/category';
 import { LocationData } from './location';
 
 export interface UserEvent {

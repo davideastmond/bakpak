@@ -5,9 +5,12 @@ export const signUpValidationSchema = object({
   email: string().required('Email is required').email('Email is invalid'),
   password1: string()
     .required('This field is required')
-    .min(8, 'Password must be at least 8 characters, contain letters and numbers and a symbol')
+    .min(
+      8,
+      'Password must be at least 8 characters, contain letters and numbers and at least one of these symbols [@#$%!]',
+    )
     .test((value) => {
-      return /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,30})/.test(value);
+      return /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{8,30})/.test(value);
     }),
   password2: string()
     .required('This field is required')
@@ -27,7 +30,7 @@ export const signUpValidationSchema = object({
       return /[\p{Letter}\s]+/gu.test(value);
     }),
   location: object({
-    address_components: array().required('Address components  missing'),
+    address_components: array().required('Address components missing'),
     formatted_address: string().required('Formatted address missing'),
     geometry: object({}).required('geoloc information missing'),
     place_id: string().required('place id missing'),

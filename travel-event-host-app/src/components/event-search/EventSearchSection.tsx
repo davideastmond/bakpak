@@ -10,11 +10,12 @@ import { Suspense, useEffect, useState } from 'react';
 import { EventCard } from '../event/event-card/Event-card';
 
 import { IAppActionType, useAppContext } from '@/lib/app-context';
-import { Category } from '@/lib/category';
+
+import { Category } from '@/lib/definitions/category';
 import {
   generateInitialCheckboxState,
   loadCheckboxStateFromLocalStorage,
-} from '../checkbox-group/utils/generate-initial-checkbox-state';
+} from '../checkbox-group/utils/checkbox-state-utils';
 import { getCheckedElements } from '../checkbox-group/utils/get-checked-elements';
 import { Spinner } from '../spinner/Spinner';
 import { EventSearchFilterBox } from './event-search-filter-box/EventSearchFilterBox';

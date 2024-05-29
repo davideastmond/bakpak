@@ -2,7 +2,8 @@ import { locationUpdateValidationSchema } from '@/lib/yup-validators/profile-upd
 import { User } from '@/models/user';
 import { ObjectSchema, object, string } from 'yup';
 
-interface RegistrationUser extends Omit<User, 'id' | '_id' | 'isAdmin' | 'imageUrl' | 'bio'> {}
+interface RegistrationUser
+  extends Omit<User, 'id' | '_id' | 'isAdmin' | 'imageUrl' | 'bio' | 'blockedUsers'> {}
 
 export const registrationValidationSchema: ObjectSchema<RegistrationUser> = object({
   firstName: string()

@@ -3,7 +3,7 @@ import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
 
 import React, { useContext } from 'react';
-import { AuthStatus } from './auth-status';
+import { AuthStatus } from './definitions/auth-status';
 
 type UpdateSession = (data?: any) => Promise<Session | null>;
 interface IAuthenticationContext {

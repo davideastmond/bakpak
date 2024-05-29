@@ -1,9 +1,10 @@
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { connectMongoDB } from '@/lib/mongodb';
 import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { profileUpdateValidationSchema } from '@/lib/yup-validators/profile-update/profile-update-validator';
 import { userScopesValidator } from '@/lib/yup-validators/users/user-scopes-validator';
 import { UserRepository } from '@/schemas/user';
-import { SecureUser } from '@/types/secure-user';
+
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {

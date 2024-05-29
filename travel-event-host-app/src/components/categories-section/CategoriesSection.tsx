@@ -1,5 +1,6 @@
 import theme from '@/app/theme';
-import { CategoryDict } from '@/lib/category-dictionary';
+
+import { CategoryDict } from '@/lib/definitions/category-dictionary';
 import { Box, Typography } from '@mui/material';
 import Link from 'next/link';
 import { CommonButton } from '../common-button/Common-Button';

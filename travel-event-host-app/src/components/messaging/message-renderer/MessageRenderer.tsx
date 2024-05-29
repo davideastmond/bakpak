@@ -1,6 +1,7 @@
 import { UserClient } from '@/app/clients/user/user-client';
 import { MessageThread } from '@/models/messaging/message-thread.model';
-import { SecureUser } from '@/types/secure-user';
+
+import { SecureUser } from '@/lib/definitions/secure-user';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { MessageBlurb, MessageBlurbContainer, TimestampStrip } from '../message-blurb/MessageBlurb';

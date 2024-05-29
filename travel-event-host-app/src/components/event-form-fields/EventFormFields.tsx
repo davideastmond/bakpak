@@ -5,8 +5,6 @@ import {
   textInputPaddings,
 } from '@/app/common-styles/form-field-sizes';
 import theme from '@/app/theme';
-import { Category } from '@/lib/category';
-import { CategoryDict } from '@/lib/category-dictionary';
 import { UserEvent } from '@/models/user-event';
 
 import { extractCoords } from '@/app/integration/google-maps-api/extract-coords';
@@ -15,6 +13,8 @@ import {
   TimezoneRequestor,
 } from '@/app/integration/google-maps-api/timezone-requestor';
 import { CoordsHelper } from '@/lib/coords-helper/coords-helper';
+import { Category } from '@/lib/definitions/category';
+import { CategoryDict } from '@/lib/definitions/category-dictionary';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Box, Button, Divider, Typography } from '@mui/material';
 import dayjs from 'dayjs';
@@ -25,7 +25,7 @@ import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { AddressAutocomplete } from '../address-autocomplete/AddressAutocomplete';
 import { CalendarPicker } from '../calendar-picker/CalendarPicker';
 import { CheckboxGroup } from '../checkbox-group/CheckboxGroup';
-import { generateInitialCheckboxStateFromArray } from '../checkbox-group/utils/generate-initial-checkbox-state';
+import { generateInitialCheckboxStateFromArray } from '../checkbox-group/utils/checkbox-state-utils';
 import { getCheckedElements } from '../checkbox-group/utils/get-checked-elements';
 import { CommonButton } from '../common-button/Common-Button';
 import { CustomTextField, StyledFormFieldSection } from '../custom-fields/CustomFields';

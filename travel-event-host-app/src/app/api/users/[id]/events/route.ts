@@ -1,8 +1,8 @@
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { connectMongoDB } from '@/lib/mongodb';
 import { isValidMongoId } from '@/lib/utils/mongo-id-validation';
 import { UserRepository } from '@/schemas/user';
 import { EventRepository } from '@/schemas/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
 
 import { NextRequest, NextResponse } from 'next/server';
 

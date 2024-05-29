@@ -1,5 +1,5 @@
 import theme from '@/app/theme';
-import { SecureUser } from '@/types/secure-user';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import LocationPinIcon from '@mui/icons-material/LocationOn';
 import { Box, ButtonBase, Menu, MenuItem, Typography } from '@mui/material';

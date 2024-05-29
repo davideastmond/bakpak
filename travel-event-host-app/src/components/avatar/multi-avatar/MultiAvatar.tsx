@@ -1,5 +1,5 @@
 import theme from '@/app/theme';
-import { SecureUser } from '@/types/secure-user';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Box } from '@mui/material';
 import { CustomGenericMuiAvatar } from '../custom-generic-user-avatar/CustomGenericUserAvatar';
 import UserAvatar from '../user-avatar/UserAvatar';

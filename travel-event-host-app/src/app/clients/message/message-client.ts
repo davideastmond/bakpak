@@ -6,10 +6,6 @@ export interface CreateAndPostMessageArgs {
   message: string;
 }
 export const MessageClient = {
-  getMessageThreadContextById: async (threadId: string): Promise<void> => {
-    // Gets data about thread
-  },
-
   getAllThreadContexts: async (): Promise<MessageThread[]> => {
     const endpoint = `/api/messages/threads`;
     const req = await fetch(endpoint);

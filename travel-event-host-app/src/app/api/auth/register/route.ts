@@ -22,12 +22,11 @@ export async function POST(req: NextRequest) {
     email: email,
   });
 
-  if (existingUser) {
+  if (existingUser)
     return NextResponse.json(
       { message: 'Unable to create account. Please try again with a different e-mail address.' },
       { status: 403 },
     );
-  }
 
   const newUser = await UserRepository.create({
     email,

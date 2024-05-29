@@ -1,8 +1,8 @@
 import theme from '@/app/theme';
-import { SecureUser } from '@/types/secure-user';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Box, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import { BaseCard } from '../base-card/BaseCard';
+import { BaseMessageCard } from '../base-message-card/Base-message-card';
 
 // For the messages. This should be rendered in a container that controls how the message displays to the left or to the right.
 export const MessageBlurb = ({
@@ -17,7 +17,11 @@ export const MessageBlurb = ({
   timestamp: Date;
 }) => {
   return (
-    <BaseCard users={user && user} backgroundColor={'white'} reverseFlow={position === 'end'}>
+    <BaseMessageCard
+      users={user && user}
+      backgroundColor={'white'}
+      reverseFlow={position === 'end'}
+    >
       <Box
         borderRadius={'5px'}
         p={2}
@@ -39,7 +43,7 @@ export const MessageBlurb = ({
           </Box>
         </Box>
       </Box>
-    </BaseCard>
+    </BaseMessageCard>
   );
 };
 

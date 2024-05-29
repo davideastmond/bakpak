@@ -1,4 +1,4 @@
-import { SecureUser } from '@/types/secure-user';
+import { SecureUser } from '@/lib/definitions/secure-user';
 import { Box, MenuItem, Stack } from '@mui/material';
 import { AvatarMessageHeaderCard } from '../avatar-message-header-card/AvatarMessageHeaderCard';
 

@@ -1,6 +1,7 @@
+import { EventTimeLine } from '@/lib/definitions/event-timeline';
 import { connectMongoDB } from '@/lib/mongodb';
 import { EventRepository } from '@/schemas/user-event';
-import { EventTimeLine } from '@/types/event-timeline';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
@@ -128,7 +129,7 @@ export async function GET(req: NextRequest) {
 
   if (allEvents[0].data.length > 0) {
     return NextResponse.json(
-      { totalCount: allEvents[0].metadata[0].totalCount, events: allEvents[0].data },
+      { totalCount: allEvents[0].metadata[0]?.totalCount || 0, events: allEvents[0].data },
       { status: 200 },
     );
   }

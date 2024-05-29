@@ -1,4 +1,4 @@
-import { Category } from '@/lib/category';
+import { Category } from './category';
 
 export const CategoryDict: Record<Category, string> = {
   [Category.TravelAndOutdoor]: 'Travel And Outdoor',

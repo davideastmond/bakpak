@@ -41,15 +41,6 @@ export function AddressAutocomplete({
       onChange={(e) => {
         setTextFieldValue(e.target.value);
       }}
-      onKeyDown={(e) => {
-        // This logic is to clear the location field when the user presses these keys
-        // It will also set the geolocation to null
-        if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Escape') {
-          e.preventDefault();
-          setTextFieldValue('');
-          onLocationSelected && onLocationSelected(null as any);
-        }
-      }}
     />
   );
 }
