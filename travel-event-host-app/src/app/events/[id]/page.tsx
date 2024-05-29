@@ -76,7 +76,7 @@ export default function EventDetailsPage({ params: { id } }: EventDetailsPagePro
 
   useEffect(() => {
     fetchEvent();
-  }, [session]);
+  }, []);
 
   useEffect(() => {
     const runMapLoader = async () => {
